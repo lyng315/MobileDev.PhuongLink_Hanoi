@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Admin_PhuongLink_Hanoi.props" />
-</Project>

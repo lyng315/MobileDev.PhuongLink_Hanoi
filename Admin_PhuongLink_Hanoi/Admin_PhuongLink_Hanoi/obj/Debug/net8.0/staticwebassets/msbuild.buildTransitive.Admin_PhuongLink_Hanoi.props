@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\Admin_PhuongLink_Hanoi.props" />
-</Project>
