@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Admin</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/admin.css" />
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="bg-dark text-white vh-100 p-3" style="width:250px">
+            <h4 class="text-white">Admin Panel</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white"
+                       asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white"
+                       asp-area="Admin" asp-controller="User" asp-action="Index">
+                        Quản lý Người dùng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white"
+                       asp-area="Admin" asp-controller="Region" asp-action="Index">
+                        Quản lý Khu vực
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main content -->
+        <div class="flex-fill p-4">
+            <nav class="navbar navbar-light bg-light mb-3">
+                <span class="navbar-brand">@ViewData["Title"]</span>
+            </nav>
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @* Cho phép view định nghĩa thêm Scripts *@
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
