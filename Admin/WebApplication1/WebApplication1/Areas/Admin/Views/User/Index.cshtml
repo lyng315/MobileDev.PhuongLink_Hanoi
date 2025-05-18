@@ -1,0 +1,35 @@
+﻿@*
+  File: Areas/Admin/Views/User/Index.cshtml
+*@
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @* Dữ liệu tĩnh demo *@
+        <tr>
+            <td>1</td>
+            <td>Nguyễn Văn A</td>
+            <td>vana@example.com</td>
+            <td>Admin</td>
+            <td>
+                <a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="1" class="btn btn-sm btn-primary">Sửa</a>
+                <a asp-area="Admin" asp-controller="User" asp-action="Delete" asp-route-id="1" class="btn btn-sm btn-danger">Xóa</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<a asp-area="Admin" asp-controller="User" asp-action="Create" class="btn btn-success">Thêm mới</a>
