@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|d:\\admin_phuonglink_hanoi\\webapplication1\\webapplication1\\areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|d:\\admin_phuonglink_hanoi\\webapplication1\\webapplication1\\areas\\admin\\controllers\\regioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\areas\\admin\\controllers\\regioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -29,10 +33,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|d:\\admin_phuonglink_hanoi\\webapplication1\\webapplication1\\areas\\admin\\views\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\areas\\admin\\views\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|d:\\admin_phuonglink_hanoi\\webapplication1\\webapplication1\\areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CD76B70F-D4A7-437A-BE77-6E44A9CC2F7C}|WebApplication1\\WebApplication1.csproj|d:\\admin_phuonglink_hanoi\\webapplication1\\webapplication1\\areas\\admin\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -70,11 +70,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "RegionController.cs",
               "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Controllers\\RegionController.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Controllers\\RegionController.cs",
@@ -87,20 +87,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
-              "ToolTip": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
-              "RelativeToolTip": "WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
-              "ViewState": "AgIAAC0AAAAAAAAAAAAAwEYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-16T11:58:06.724Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "RegionDto.cs",
               "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Models\\Dtos\\RegionDto.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Models\\Dtos\\RegionDto.cs",
@@ -113,7 +100,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Create.cshtml",
               "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Region\\Create.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Views\\Region\\Create.cshtml",
@@ -126,7 +113,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Edit.cshtml",
               "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Region\\Edit.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Views\\Region\\Edit.cshtml",
@@ -139,7 +126,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAABAAAAAAAAAAAAAAwCAAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-05-16T07:58:13.027Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
+              "ToolTip": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
+              "RelativeToolTip": "WebApplication1\\Areas\\Admin\\Views\\Region\\Index.cshtml",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAAwEYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-05-16T11:58:06.724Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "UserController.cs",
               "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Controllers\\UserController.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Controllers\\UserController.cs",
@@ -164,7 +177,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Dashboard\\Index.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Views\\Dashboard\\Index.cshtml",
@@ -174,18 +187,6 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-05-16T08:01:05.359Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "D:\\Admin_PhuongLink_Hanoi\\WebApplication1\\WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "WebApplication1\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAABwAAAAAAAAAAAAAwDQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-16T07:58:13.027Z"
             },
             {
               "$type": "Document",
