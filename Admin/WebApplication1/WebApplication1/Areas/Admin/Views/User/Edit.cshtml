@@ -1,19 +1,103 @@
-﻿@model WebApplication1.Models.Dtos.RegionDto
+﻿@model WebApplication1.Models.Dtos.UserDto
+@using WebApplication1.Models.Dtos
+
 @{
-    ViewData["Title"] = "Sửa Phường/Xã";
+    var districts = ViewBag.Districts as List<string> ?? new List<string>();
+    var allRegions = ViewBag.Regions as List<RegionDto> ?? new List<RegionDto>();
+    ViewData["Title"] = "Sửa Người Dùng";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-area="Admin" asp-controller="Region" asp-action="Edit" method="post">
+<form asp-area="Admin" asp-controller="User" asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
+
     <div class="mb-3">
-        <label class="form-label">Phường/Xã</label>
-        <input asp-for="Ward" class="form-control" />
+        <label class="form-label">Họ tên</label>
+        <input asp-for="FullName" class="form-control" />
     </div>
+
     <div class="mb-3">
-        <label class="form-label">Quận/Huyện</label>
-        <input asp-for="District" class="form-control" />
+        <label class="form-label">Email</label>
+        <input asp-for="Email" type="email" class="form-control" />
     </div>
+
+    <div class="mb-3">
+        <label class="form-label">Mật khẩu</label>
+        <input asp-for="Password" type="text" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Số điện thoại</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">CCCD</label>
+        <input asp-for="CCCD" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Chọn Quận/Huyện</label>
+        <select asp-for="District" id="districtSelect" class="form-control">
+            <option value="">-- Chọn Quận/Huyện --</option>
+            @foreach (var d in districts)
+            {
+                <option value="@d" selected="@(Model.District == d ? "selected" : null)">@d</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Chọn Phường/Xã</label>
+        <select asp-for="Ward" id="wardSelect" class="form-control">
+            <option value="">-- Chọn Phường/Xã --</option>
+            @foreach (var r in allRegions.Where(x => x.District == Model.District))
+            {
+                <option value="@r.Ward" selected="@(Model.Ward == r.Ward ? "selected" : null)">@r.Ward</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Vai trò</label>
+        <select asp-for="Role" class="form-control">
+            <option value="User" selected="@(Model.Role == "User" ? "selected" : null)">User</option>
+            <option value="Leader" selected="@(Model.Role == "Leader" ? "selected" : null)">Leader</option>
+            <option value="Admin" selected="@(Model.Role == "Admin" ? "selected" : null)">Admin</option>
+        </select>
+    </div>
+
     <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="btn btn-secondary">Hủy</a>
 </form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const regions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(allRegions));
+            const districtSelect = document.getElementById("districtSelect");
+            const wardSelect = document.getElementById("wardSelect");
+
+            function loadWards(selectedDistrict, currentWard) {
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                regions.filter(r => r.District === selectedDistrict)
+                       .forEach(r => {
+                           const opt = document.createElement("option");
+                           opt.value = r.Ward;
+                           opt.textContent = r.Ward;
+                           if (r.Ward === currentWard) opt.selected = true;
+                           wardSelect.appendChild(opt);
+                       });
+            }
+
+            // Gọi khi chọn Quận
+            districtSelect.addEventListener("change", function () {
+                loadWards(this.value, null);
+            });
+
+            // Gọi khi vào trang để load sẵn
+            loadWards(districtSelect.value, "@Model.Ward");
+        });
+    </script>
+}

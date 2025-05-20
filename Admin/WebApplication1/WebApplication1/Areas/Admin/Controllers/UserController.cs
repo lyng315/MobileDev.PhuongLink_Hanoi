@@ -60,6 +60,13 @@ namespace WebApplication1.Areas.Admin.Controllers
 
             var dto = snap.ConvertTo<UserDto>();
             dto.Id = id;
+
+            // 🔥 Load danh sách Quận/Huyện & Phường/Xã
+            var regionsSnap = await _db.Collection("Regions").GetSnapshotAsync();
+            var regions = regionsSnap.Documents.Select(d => d.ConvertTo<RegionDto>()).ToList();
+            ViewBag.Districts = regions.Select(r => r.District).Distinct().OrderBy(d => d).ToList();
+            ViewBag.Regions = regions;
+
             return View(dto);
         }
 
