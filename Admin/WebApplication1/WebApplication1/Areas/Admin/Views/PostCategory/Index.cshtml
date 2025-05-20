@@ -1,0 +1,70 @@
+﻿@using WebApplication1.Models.Dtos
+@model IEnumerable<PostCategoryDto>
+
+@{
+    ViewData["Title"] = "Quản lý Danh mục Tin tức";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<p>
+    <a asp-area="Admin" asp-controller="PostCategory" asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Thêm Danh mục
+    </a>
+</p>
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <input name="keyword"
+               value="@Context.Request.Query["keyword"]"
+               class="form-control"
+               placeholder="Tìm theo tên danh mục" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary">Tìm kiếm</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th style="width:5%">#</th>
+            <th style="width:25%">ID</th>
+            <th style="width:50%">Tên Danh mục</th>
+            <th style="width:20%">Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr><td colspan="4" class="text-center">Chưa có dữ liệu</td></tr>
+        }
+        else
+        {
+            var idx = 1;
+            foreach (var cat in Model)
+            {
+                <tr>
+                    <td>@idx</td>
+                    <td>@cat.Id</td>
+                    <td>@cat.Name</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="PostCategory" asp-action="Edit"
+                           asp-route-id="@cat.Id" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil-square"></i> Sửa
+                        </a>
+                        <form asp-area="Admin" asp-controller="PostCategory" asp-action="Delete"
+                              asp-route-id="@cat.Id" method="post" class="d-inline"
+                              onsubmit="return confirm('Xác nhận xóa?');">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                ;
+                idx++;
+            }
+        }
+    </tbody>
+</table>

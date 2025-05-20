@@ -1,0 +1,16 @@
+﻿@model WebApplication1.Models.Dtos.PostCategoryDto
+@{
+    ViewData["Title"] = "Sửa Danh mục Tin tức";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-area="Admin" asp-controller="PostCategory" asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label class="form-label">Tên Danh mục</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a asp-area="Admin" asp-controller="PostCategory" asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>
