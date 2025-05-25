@@ -1,0 +1,63 @@
+﻿@model IEnumerable<WebApplication1.Models.Dtos.UserDto>
+
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-area="Admin" asp-controller="User" asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Thêm mới
+    </a>
+</p>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th style="width:5%">#</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>SĐT</th>
+            <th>CCCD</th>
+            <th>Phường/Xã</th>
+            <th>Quận/Huyện</th>
+            <th>Vai trò</th>
+            <th>Ngày tạo</th>
+            <th style="width:15%">Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="10" class="text-center">Chưa có người dùng nào.</td>
+            </tr>
+        }
+        else
+        {
+            var idx = 1;
+            foreach (var user in Model)
+            {
+                <tr>
+                    <td>@idx</td>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.CCCD</td>
+                    <td>@user.Ward</td>
+                    <td>@user.District</td>
+                    <td>@user.Role</td>
+                    <td>@user.CreatedAt.ToDateTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Sửa</a>
+                        <form asp-area="Admin" asp-controller="User" asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="return confirm('Xác nhận xóa người dùng này?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                idx++;
+            }
+        }
+    </tbody>
+</table>

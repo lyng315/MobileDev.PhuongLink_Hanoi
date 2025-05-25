@@ -1,0 +1,70 @@
+﻿@using WebApplication1.Models.Dtos
+@model IEnumerable<Comment>
+
+@{
+    ViewData["Title"] = "Quản lý Bình luận";
+    var keyword = Context.Request.Query["keyword"];
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <input name="keyword"
+               value="@keyword"
+               class="form-control"
+               placeholder="Tìm theo nội dung hoặc ID" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th style="width:5%">#</th>
+            <th style="width:30%">Nội dung</th>
+            <th style="width:15%">Post ID</th>
+            <th style="width:15%">User ID</th>
+            <th style="width:20%">Ngày tạo</th>
+            <th style="width:15%">Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center">Chưa có dữ liệu</td>
+            </tr>
+        }
+        else
+        {
+            var idx = 1;
+            foreach (var c in Model)
+            {
+                <tr>
+                    <td>@idx</td>
+                    <td>@c.Content</td>
+                    <td>@c.PostId</td>
+                    <td>@c.UserId</td>
+                    <td>@c.CreatedAt.ToLocalTime():g</td>
+                    <td>
+                        <form asp-area="Admin"
+                              asp-controller="Comment"
+                              asp-action="Delete"
+                              asp-route-id="@c.Id"
+                              method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('Xác nhận xóa?');">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                idx++;
+            }
+        }
+    </tbody>
+</table>

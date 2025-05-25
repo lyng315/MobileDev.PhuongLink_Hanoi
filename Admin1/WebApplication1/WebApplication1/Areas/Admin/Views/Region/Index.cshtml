@@ -1,0 +1,106 @@
+﻿@using System.Globalization
+@using System.Linq
+@model IEnumerable<WebApplication1.Models.Dtos.RegionDto>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý Khu vực Địa lý";
+    var grouped = Model.GroupBy(r => r.District);
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<div class="d-flex align-items-center mb-3">
+    <a asp-area="Admin" asp-controller="Region" asp-action="Create" class="btn btn-success me-3">
+        <i class="bi bi-plus-lg"></i> Thêm Khu vực
+    </a>
+    <form method="get" class="d-flex">
+        <input name="keyword"
+               value="@Context.Request.Query["keyword"]"
+               class="form-control me-2"
+               placeholder="Tìm Phường hoặc Quận..." />
+        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+    </form>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Chưa có dữ liệu</div>
+}
+else
+{
+    @foreach (var grp in grouped)
+    {
+        var district = grp.Key;
+        var normalized = district.Normalize(System.Text.NormalizationForm.FormD);
+        var chars = normalized
+                          .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                          .ToArray();
+        var safeKey = new string(chars).Replace(" ", "");
+        var safeId = "grp" + safeKey;
+
+        <div class="card mb-2">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Quận/Huyện: <strong>@district</strong></span>
+                <button type="button" class="btn btn-link btn-toggle" data-target="#@safeId">
+                    <i class="bi bi-chevron-down fs-4"></i>
+                </button>
+            </div>
+            <div id="@safeId" class="collapse">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:5%">#</th>
+                            <th style="width:20%">ID</th>
+                            <th style="width:50%">Phường/Xã</th>
+                            <th style="width:25%">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var idx = 1;
+                            foreach (var r in grp)
+                            {
+                                <tr>
+                                    <td>@idx</td>
+                                    <td>@r.Id</td>
+                                    <td>@r.Ward</td>
+                                    <td>
+                                        <a asp-area="Admin"
+                                           asp-controller="Region"
+                                           asp-action="Edit"
+                                           asp-route-id="@r.Id"
+                                           class="btn btn-sm btn-warning me-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-area="Admin"
+                                              asp-controller="Region"
+                                              asp-action="Delete"
+                                              asp-route-id="@r.Id"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Xác nhận xóa?')">
+                                            <button class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                idx++;
+                            }
+                        }
+                    </tbody>
+                </table>
+                <div class="p-3 border-top">
+                    <a asp-area="Admin"
+                       asp-controller="Region"
+                       asp-action="Create"
+                       asp-route-district="@district"
+                       class="btn btn-sm btn-success">
+                        <i class="bi bi-plus-lg"></i> Thêm Phường mới
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+}
