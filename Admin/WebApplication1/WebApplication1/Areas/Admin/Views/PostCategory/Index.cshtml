@@ -1,0 +1,42 @@
+﻿@model IEnumerable<WebApplication1.Models.Dtos.PostCategoryDto>
+@{
+    ViewData["Title"] = "Danh Sách Danh Mục Tin";
+    var keyword = ViewBag.Keyword as string ?? "";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-area="Admin" asp-controller="PostCategory" asp-action="Index" method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <input type="text" name="keyword" value="@keyword" class="form-control" placeholder="Tìm kiếm..." />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Tìm</button>
+    </div>
+    <div class="col-auto">
+        <a asp-area="Admin" asp-controller="PostCategory" asp-action="Create" class="btn btn-success">Thêm mới</a>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tên danh mục</th>
+            <th>Hành Động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>
+                    <a asp-area="Admin" asp-controller="PostCategory" asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Sửa</a>
+                    <form asp-area="Admin" asp-controller="PostCategory" asp-action="Delete" asp-route-id="@c.Id" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?');">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
