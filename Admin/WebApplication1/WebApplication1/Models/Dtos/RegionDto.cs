@@ -8,10 +8,8 @@ namespace WebApplication1.Models.Dtos
         [FirestoreDocumentId]
         public string Id { get; set; } = "";
 
-        [FirestoreProperty("Ward")]
-        public string Ward { get; set; } = "";
-
-        [FirestoreProperty("District")]
-        public string District { get; set; } = "";
+        // FirestoreSeeder lưu vào field "name"
+        [FirestoreProperty("name")]
+        public string Name { get; set; } = "";
     }
 }

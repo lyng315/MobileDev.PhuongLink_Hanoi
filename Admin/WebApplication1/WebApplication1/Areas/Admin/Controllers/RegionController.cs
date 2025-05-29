@@ -1,5 +1,6 @@
 ﻿using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models.Dtos;
@@ -10,30 +11,25 @@ namespace WebApplication1.Areas.Admin.Controllers
     public class RegionController : Controller
     {
         private readonly FirestoreDb _db;
-        public RegionController(FirestoreDb db) => _db = db;
+        private const string COLL = "regions";
+
+        public RegionController(FirestoreDb db)
+        {
+            _db = db;
+        }
 
         // GET: /Admin/Region
-        public async Task<IActionResult> Index(string keyword)
+        public async Task<IActionResult> Index()
         {
-            var snap = await _db.Collection("Regions").GetSnapshotAsync();
+            var snap = await _db.Collection(COLL).GetSnapshotAsync();
             var list = snap.Documents
-                .Select(d =>
-                {
-                    var dto = d.ConvertTo<RegionDto>();
-                    dto.Id = d.Id;
-                    return dto;
-                })
-                .ToList();
-
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                list = list
-                    .Where(r =>
-                        r.Ward.Contains(keyword, StringComparison.OrdinalIgnoreCase)
-                        || r.District.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-
+                           .Select(d =>
+                           {
+                               var dto = d.ConvertTo<RegionDto>();
+                               dto.Id = d.Id;
+                               return dto;
+                           })
+                           .ToList();
             return View(list);
         }
 
@@ -44,10 +40,29 @@ namespace WebApplication1.Areas.Admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RegionDto dto)
         {
-            if (!ModelState.IsValid) return View(dto);
+            if (!ModelState.IsValid)
+                return View(dto);
 
-            var doc = _db.Collection("Regions").Document();
-            await doc.SetAsync(new { dto.Ward, dto.District });
+            // 1) Lấy tất cả IDs hiện có
+            var snap = await _db.Collection(COLL).GetSnapshotAsync();
+            var maxNum = snap.Documents
+                              .Select(d => d.Id)
+                              .Where(id => id.StartsWith("region"))
+                              .Select(id =>
+                              {
+                                  var tail = id.Substring("region".Length);
+                                  return int.TryParse(tail, out var n) ? n : 0;
+                              })
+                              .DefaultIfEmpty(0)
+                              .Max();
+
+            // 2) Tính ID mới
+            var newId = $"region{maxNum + 1:00}";
+
+            // 3) Tạo document với ID mới
+            await _db.Collection(COLL)
+                     .Document(newId)
+                     .SetAsync(dto);
 
             return RedirectToAction(nameof(Index));
         }
@@ -55,11 +70,13 @@ namespace WebApplication1.Areas.Admin.Controllers
         // GET: /Admin/Region/Edit/{id}
         public async Task<IActionResult> Edit(string id)
         {
-            var snap = await _db.Collection("Regions").Document(id).GetSnapshotAsync();
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
+            var snap = await _db.Collection(COLL).Document(id).GetSnapshotAsync();
             if (!snap.Exists) return NotFound();
 
             var dto = snap.ConvertTo<RegionDto>();
-            dto.Id = id;
+            dto.Id = snap.Id;
             return View(dto);
         }
 
@@ -69,12 +86,9 @@ namespace WebApplication1.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid) return View(dto);
 
-            var docRef = _db.Collection("Regions").Document(dto.Id);
-            await docRef.UpdateAsync(new Dictionary<string, object>
-            {
-                { "Ward",     dto.Ward     },
-                { "District", dto.District }
-            });
+            await _db.Collection(COLL)
+                     .Document(dto.Id)
+                     .UpdateAsync("name", dto.Name);
 
             return RedirectToAction(nameof(Index));
         }
@@ -83,7 +97,12 @@ namespace WebApplication1.Areas.Admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
-            await _db.Collection("Regions").Document(id).DeleteAsync();
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            await _db.Collection(COLL)
+                     .Document(id)
+                     .DeleteAsync();
+
             return RedirectToAction(nameof(Index));
         }
     }

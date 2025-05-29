@@ -1,0 +1,72 @@
+﻿@model WebApplication1.Models.ViewModels.StatisticalViewModel
+
+@{
+    ViewData["Title"] = "Thống kê hệ thống";
+}
+
+<h2 class="text-primary mb-4">Thống kê tổng quan</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                Tổng người dùng: <strong>@Model.TotalUsers</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                Tổng bình luận: <strong>@Model.TotalComments</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                Tổng bài đăng: <strong>@Model.TotalPosts</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                Bài đăng tuần này: <strong>@Model.PostsThisWeek</strong><br />
+                Bài đăng tháng này: <strong>@Model.PostsThisMonth</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mt-4 mb-3">Biểu đồ số bài đăng theo ngày</h3>
+<canvas id="postsChart" width="100%" height="40"></canvas>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('postsChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.PostsChartLabels)),
+                datasets: [{
+                    label: 'Số bài đăng',
+                    data: @Html.Raw(Json.Serialize(Model.PostsChartData)),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\WebApplication1",
+    "\\WebApplication1\\WebApplication1",
+    "\\WebApplication1\\WebApplication1\\bin",
+    "\\WebApplication1\\WebApplication1\\Controllers",
+    "\\WebApplication1\\WebApplication1\\Properties",
+    "\\WebApplication1\\WebApplication1\\Services",
+    "\\WebApplication1\\WebApplication1\\wwwroot"
+  ],
+  "SelectedNode": "\\WebApplication1\\WebApplication1\\Models",
+  "PreviewInSolutionExplorer": false
+}

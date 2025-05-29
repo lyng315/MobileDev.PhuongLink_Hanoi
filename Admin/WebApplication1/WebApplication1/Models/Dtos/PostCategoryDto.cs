@@ -8,7 +8,8 @@ namespace WebApplication1.Models.Dtos
         [FirestoreDocumentId]
         public string Id { get; set; } = "";
 
-        [FirestoreProperty("Name")]
+        // FirestoreSeeder dùng key "name" (lowercase)
+        [FirestoreProperty("name")]
         public string Name { get; set; } = "";
     }
 }

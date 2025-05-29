@@ -1,63 +1,41 @@
 ﻿@model IEnumerable<WebApplication1.Models.Dtos.UserDto>
-
 @{
-    ViewData["Title"] = "Quản lý Người dùng";
+    ViewData["Title"] = "Danh Sách Người Dùng";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <p>
-    <a asp-area="Admin" asp-controller="User" asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-lg"></i> Thêm mới
-    </a>
+    <a asp-area="Admin" asp-controller="User" asp-action="Create" class="btn btn-success">Thêm Người Dùng</a>
 </p>
 
-<table class="table table-bordered table-hover">
-    <thead class="table-light">
+<table class="table table-striped">
+    <thead>
         <tr>
-            <th style="width:5%">#</th>
-            <th>Họ tên</th>
             <th>Email</th>
-            <th>SĐT</th>
-            <th>CCCD</th>
-            <th>Phường/Xã</th>
-            <th>Quận/Huyện</th>
-            <th>Vai trò</th>
-            <th>Ngày tạo</th>
-            <th style="width:15%">Hành động</th>
+            <th>Họ Tên</th>
+            <th>Điện Thoại</th>
+            <th>Khu Vực</th>
+            <th>Vai Trò</th>
+            <th>Hành Động</th>
         </tr>
     </thead>
     <tbody>
-        @if (!Model.Any())
+        @foreach (var u in Model)
         {
             <tr>
-                <td colspan="10" class="text-center">Chưa có người dùng nào.</td>
+                <td>@u.Email</td>
+                <td>@u.FullName</td>
+                <td>@u.PhoneNumber</td>
+                <td>@u.RegionId</td>
+                <td>@u.RoleId</td>
+                <td>
+                    <a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-warning">Sửa</a>
+                    <form asp-area="Admin" asp-controller="User" asp-action="Delete" asp-route-id="@u.Id" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?');">Xóa</button>
+                    </form>
+                </td>
             </tr>
-        }
-        else
-        {
-            var idx = 1;
-            foreach (var user in Model)
-            {
-                <tr>
-                    <td>@idx</td>
-                    <td>@user.FullName</td>
-                    <td>@user.Email</td>
-                    <td>@user.PhoneNumber</td>
-                    <td>@user.CCCD</td>
-                    <td>@user.Ward</td>
-                    <td>@user.District</td>
-                    <td>@user.Role</td>
-                    <td>@user.CreatedAt.ToDateTime().ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>
-                        <a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Sửa</a>
-                        <form asp-area="Admin" asp-controller="User" asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="return confirm('Xác nhận xóa người dùng này?');">
-                            <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-                idx++;
-            }
         }
     </tbody>
 </table>
