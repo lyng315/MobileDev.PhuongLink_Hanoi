@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.PhuongLink_app" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Tắt luôn title bar của window -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <!-- ... những item khác ... -->
+    </style>
+</resources>

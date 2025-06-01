@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">PhuongLink_app</string>
+    <string name="logo_hanoi_desc">Logo Hà Nội</string>
+    <string name="city_name">HÀ NỘI</string>
+    <string name="hint_username">Email/SĐT</string>
+    <string name="hint_password">Mật khẩu</string>
+    <string name="tv_forgot">Quên mật khẩu?</string>
+    <string name="btn_login">Đăng nhập</string>
+    <string name="tv_signup_prompt">Chưa có tài khoản?</string>
+    <string name="tv_signup_link">Đăng kí ngay.</string>
+    <string name="desc_logo">Logo PhuongLink Hà Nội</string>
+    <!-- Content description cho nút lọc -->
+    <string name="desc_filter">Bộ lọc tìm kiếm</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_post">Đăng bài</string>
+    <string name="nav_notifications">Thông báo</string>
+    <string name="nav_profile">Cá nhân</string>
+    <string name="desc_posts_list">Danh sách thông báo</string>
+    <string name="hint_search">Tìm kiếm</string>
+    <string name="desc_favorite">Yêu thích</string>
+    <string name="desc_comment">Bình luận</string>
+    <string name="title_forgot_password">Quên mật khẩu</string>
+    <string name="verify_email_title">Kiểm tra email của bạn</string>
+    <string name="verify_email_subtitle">Mã xác thực đã được gửi tới email 25***@e.tlu.edu.vn</string>
+    <string name="hint_verification_code">Nhập mã xác thực</string>
+    <string name="action_resend_code">Gửi lại mã</string>
+    <string name="action_back">Trở về</string>
+    <string name="action_next">Tiếp</string>
+    <string name="desc_verification_success">Xác nhận thành công</string>
+    <string name="desc_input_code">Ô nhập mã xác thực</string>
+    <string name="hint_verify_code">Nhập mã xác thực</string>
+    <string name="desc_verify_code">Mã xác thực</string>
+    <string name="resend_code">Gửi lại mã</string>
+    <string name="btn_back_code">Trở về</string>
+    <string name="btn_next_code">Tiếp</string>
+
+
+</resources>
