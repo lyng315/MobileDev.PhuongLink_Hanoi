@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    package="com.example.phuonglink_app">
+
+    <!-- Quy định quyền (nếu có) cần khai báo ở đây, ví dụ: -->
+    <!-- <uses-permission android:name="android.permission.INTERNET" /> -->
 
     <application
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.PhuongLink_app"
-        tools:targetApi="31">
+        android:theme="@style/Theme.PhuongLink_app">
 
-        <!-- Splash screen -->
+        <!-- MainActivity: màn hình khởi động (Launcher) -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -23,12 +22,32 @@
             </intent-filter>
         </activity>
 
-        <!-- Login screen -->
+        <!-- LoginActivity: màn hình đăng nhập -->
         <activity
             android:name=".LoginActivity"
             android:exported="true" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".ForgotPasswordActivity"/>
-    </application>
 
+        <!-- HomeActivity: màn hình chính sau khi đăng nhập -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="true" />
+
+        <!-- ForgotPasswordActivity: màn hình quên mật khẩu -->
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="true" />
+
+        <!-- PostDetailActivity: màn hình chi tiết bài đăng (nếu có) -->
+        <activity
+            android:name=".PostDetailActivity"
+            android:exported="true" />
+
+        <!-- (Nếu có các Activity khác, thêm vào ở đây, ví dụ) -->
+        <!--
+        <activity
+            android:name=".AnotherActivity"
+            android:exported="false" />
+        -->
+
+    </application>
 </manifest>

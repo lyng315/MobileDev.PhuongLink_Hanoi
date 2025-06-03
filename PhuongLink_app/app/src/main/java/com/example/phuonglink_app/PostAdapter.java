@@ -1,6 +1,7 @@
 package com.example.phuonglink_app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;  // Đảm bảo bạn đã thêm Glide dependency
-
+import com.bumptech.glide.Glide;  // đảm bảo Glide đã được khai báo trong Gradle
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
@@ -29,6 +31,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     @NonNull
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // inflate layout item_post_preview.xml đã có sẵn
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.item_post_preview, parent, false);
         return new PostViewHolder(view);
@@ -36,9 +39,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-        Post post = postList.get(position);
+        // Giữ post làm "effectively final" để dùng trong lambda
+        final Post post = postList.get(position);
 
-        // 1. Severity (mức độ) và màu sắc
+        // 1. Hiển thị mức độ (urgencyLevel) và đổi màu theo level
         int level = post.getUrgencyLevel();
         switch (level) {
             case 3:
@@ -59,10 +63,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 break;
         }
 
-        // 2. Title
+        // 2. Hiển thị title
         holder.tvTitle.setText(post.getTitle());
 
-        // 3. Time ago
+        // 3. Hiển thị "time ago" (ví dụ: "20 phút trước")
         if (post.getCreatedAt() != null) {
             long millis = post.getCreatedAt().toDate().getTime();
             String timeAgo = DateUtils.getRelativeTimeSpanString(
@@ -75,26 +79,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.tvTime.setText("");
         }
 
-        // 4. Thumbnail (Glide) với placeholder 'loading'
+        // 4. Load thumbnail (Glide), nếu không có thumbnailUrl thì hiện ảnh loading mặc định
         String thumbUrl = post.getThumbnailUrl();
         if (thumbUrl != null && !thumbUrl.isEmpty()) {
             Glide.with(context)
                     .load(thumbUrl)
-                    .placeholder(R.drawable.loading)   // dùng loading.png làm placeholder
+                    .placeholder(R.drawable.loading)  // cần có drawable/loading.png
                     .into(holder.ivThumbnail);
         } else {
-            // Nếu không có URL, hiển thị trực tiếp loading.png
             holder.ivThumbnail.setImageResource(R.drawable.loading);
         }
 
-        // 5. Icon Favorite / Comment
+        // 5. Khi click vào item, mở PostDetailActivity và gửi qua các trường hiện có
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, PostDetailActivity.class);
+            intent.putExtra("title", post.getTitle());
+            intent.putExtra("urgency", post.getUrgencyLevel());
+
+            // Format createdAt thành chuỗi "dd/MM/yyyy HH:mm" để hiển thị trong Detail
+            String formattedTime = "";
+            if (post.getCreatedAt() != null) {
+                long millis = post.getCreatedAt().toDate().getTime();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                formattedTime = sdf.format(millis);
+            }
+            intent.putExtra("createdAt", formattedTime);
+
+            // Gửi thumbnailUrl (nếu bạn muốn hiển thị ảnh trong Detail)
+            intent.putExtra("imageUrl", post.getThumbnailUrl());
+
+            // Vì hiện tại bạn chưa có field content, nên không truyền "content"
+            // Nếu sau này thêm field "content" vào Post.java thì mới gọi post.getContent() ở đây
+
+            context.startActivity(intent);
+        });
+
+        // 6. Xử lý click trên biểu tượng Favorite / Comment (tùy nhu cầu)
         holder.ivFavorite.setOnClickListener(v -> {
-            // Thay icon khi đã like (nếu bạn đã thêm ic_favorite_filled)
-            // tạm thời dùng lại ic_favorite_border nếu chưa có ic_favorite_filled
-            holder.ivFavorite.setImageResource(R.drawable.ic_favorite_border);
+            // Ví dụ: đổi sang icon filled (nếu có)
+            holder.ivFavorite.setImageResource(R.drawable.ic_favorite_base);
         });
         holder.ivComment.setOnClickListener(v -> {
-            // Mở màn hình comment (nếu có)
+            // TODO: mở màn hình bình luận nếu đã implement
         });
     }
 
@@ -119,7 +145,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     /**
-     * Cập nhật lại danh sách bài đăng, rồi refresh RecyclerView
+     * Nếu bạn muốn cập nhật danh sách post mới (ví dụ sau khi load thêm từ Firestore),
+     * gọi adapter.updateList(mListMới) rồi adapter.notifyDataSetChanged() bên Activity/Fragment.
      */
     public void updateList(List<Post> newList) {
         postList = newList;

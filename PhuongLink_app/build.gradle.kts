@@ -9,6 +9,8 @@ buildscript {
     dependencies {
         // Đưa version plugin phù hợp (dialog gợi ý 4.4.2)
         classpath("com.google.gms:google-services:4.4.2")
+        classpath ("com.android.tools.build:gradle:8.0.2")
+        classpath ("com.google.gms:google-services:4.3.15")
     }
 }
 

@@ -2,109 +2,89 @@ package com.example.phuonglink_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
-import androidx.annotation.NonNull;
-import com.google.android.gms.tasks.OnSuccessListener;
-
+/**
+ * Activity màn Login chính. Khi người dùng bấm "Quên mật khẩu?", sẽ chuyển sang ForgotPasswordActivity.
+ * Đăng nhập sử dụng FirebaseAuth thay vì query Firestore.
+ */
 public class LoginActivity extends AppCompatActivity {
-    private TextInputEditText edtUsername, edtPassword;
-    private MaterialButton btnLogin;
-    private TextView tvError, tvForgot;
-    private FirebaseFirestore db;
+    private TextView            tvError;
+    private TextInputEditText   edtUsername;
+    private TextInputEditText   edtPassword;
+    private MaterialButton      btnLogin;
+    private TextView            tvForgot;
+
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Ánh xạ view
+        // Ánh xạ các View trong activity_login.xml
         tvError     = findViewById(R.id.tvError);
-        tvForgot    = findViewById(R.id.tvForgot);
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
         btnLogin    = findViewById(R.id.btnLogin);
+        tvForgot    = findViewById(R.id.tvForgot);
 
-        // Ẩn thông báo lỗi ban đầu
-        tvError.setVisibility(View.GONE);
+        // Bấm vào "Quên mật khẩu?" -> chạy ForgotPasswordActivity
+        tvForgot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        // Khởi tạo Firestore
-        db = FirebaseFirestore.getInstance();
+        // Logic đăng nhập sử dụng FirebaseAuth
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email    = edtUsername.getText().toString().trim();
+                String password = edtPassword.getText().toString().trim();
 
-        // Khi bấm "Quên mật khẩu?" -> mở ForgotPasswordActivity
-        tvForgot.setOnClickListener(v ->
-                startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class))
-        );
+                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+                    showError("Vui lòng nhập đầy đủ tài khoản và mật khẩu");
+                    return;
+                }
 
-        // Bắt sự kiện click Đăng nhập
-        btnLogin.setOnClickListener(view -> attemptLogin());
-    }
-
-    private void attemptLogin() {
-        // Ẩn thông báo lỗi mỗi lần thử
-        tvError.setVisibility(View.GONE);
-
-        String email    = edtUsername.getText().toString().trim();
-        String password = edtPassword.getText().toString().trim();
-
-        // Kiểm tra đầu vào
-        if (email.isEmpty()) {
-            showError("Vui lòng nhập email");
-            edtUsername.requestFocus();
-            return;
-        }
-        if (password.isEmpty()) {
-            showError("Vui lòng nhập mật khẩu");
-            edtPassword.requestFocus();
-            return;
-        }
-
-        // Truy vấn Firestore
-        db.collection("users")
-                .whereEqualTo("email", email)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot snapshots) {
-                        if (snapshots.isEmpty()) {
-                            showError("Tài khoản không tồn tại");
-                        } else {
-                            DocumentSnapshot userDoc = snapshots.getDocuments().get(0);
-                            String storedHash = userDoc.getString("passwordHash");
-                            // So sánh plain-text (nếu dùng hash thì apply thuật toán ở đây)
-                            if (password.equals(storedHash)) {
-                                // Đăng nhập thành công
-                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                                intent.putExtra("USER_ID", userDoc.getId());
-                                startActivity(intent);
-                                finish();
+                auth.signInWithEmailAndPassword(email, password)
+                        .addOnSuccessListener(authResult -> {
+                            // Đăng nhập thành công -> chuyển sang HomeActivity
+                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("LoginActivity", "signInWithEmail:failure", e);
+                            if (e instanceof FirebaseAuthInvalidUserException) {
+                                // Email chưa được đăng ký
+                                edtUsername.setError("Email chưa được đăng ký");
+                            } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                // Mật khẩu không đúng
+                                edtPassword.setError("Mật khẩu không đúng");
                             } else {
-                                showError("Mật khẩu không chính xác");
+                                showError("Đăng nhập thất bại: " + e.getMessage());
                             }
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("LoginActivity", "Lỗi khi truy vấn Firestore", e);
-                        showError("Lỗi kết nối, vui lòng thử lại");
-                    }
-                });
+                        });
+            }
+        });
     }
 
-    /** Hiển thị thông báo lỗi lên đầu form */
+    /** Hiển thị thông báo lỗi lên đầu form login */
     private void showError(String message) {
         tvError.setText(message);
         tvError.setVisibility(View.VISIBLE);

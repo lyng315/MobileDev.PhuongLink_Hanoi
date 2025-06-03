@@ -1,7 +1,10 @@
 package com.example.phuonglink_app;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -29,11 +32,13 @@ public class HomeActivity extends AppCompatActivity {
     private PostAdapter postAdapter;
     private List<Post> postList;
     private FirebaseFirestore db;
+    private EditText etSearch;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        etSearch = findViewById(R.id.etSearch);
 
         // 1. Khởi tạo Firestore
         db = FirebaseFirestore.getInstance();
@@ -47,6 +52,25 @@ public class HomeActivity extends AppCompatActivity {
 
         // 3. Load posts từ Firestore
         loadPostsFromFirestore();
+
+        // 4. Xử lý tìm kiếm theo tiêu đề
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String keyword = s.toString().trim();
+                if (keyword.isEmpty()) {
+                    loadPostsFromFirestore(); // Hiện tất cả
+                } else {
+                    searchPostsByTitle(keyword);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private void loadPostsFromFirestore() {
@@ -79,6 +103,37 @@ public class HomeActivity extends AppCompatActivity {
                             }
                             postAdapter.notifyDataSetChanged();
                         }
+                    }
+                });
+    }
+    private void searchPostsByTitle(String keyword) {
+        db.collection("posts")
+                .orderBy("title")
+                .startAt(keyword)
+                .endAt(keyword + "\uf8ff")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("HomeActivity", "Lỗi tìm kiếm", e);
+                        Toast.makeText(HomeActivity.this, "Lỗi tìm kiếm", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    postList.clear();
+                    if (snapshots != null) {
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            if (doc.exists()) {
+                                String id = doc.getId();
+                                String title = doc.getString("title");
+                                Long ul = doc.getLong("urgencyLevel");
+                                int urgencyLevel = ul != null ? ul.intValue() : 1;
+                                Timestamp createdAt = doc.getTimestamp("createdAt");
+                                String thumbUrl = doc.getString("thumbnailUrl");
+                                if (thumbUrl == null) thumbUrl = "";
+
+                                postList.add(new Post(id, title, urgencyLevel, createdAt, thumbUrl));
+                            }
+                        }
+                        postAdapter.notifyDataSetChanged();
                     }
                 });
     }
