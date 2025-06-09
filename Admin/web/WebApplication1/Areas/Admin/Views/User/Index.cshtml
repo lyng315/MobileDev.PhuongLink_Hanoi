@@ -17,13 +17,13 @@
     <thead class="table-light">
         <tr>
             <th style="width: 5%;">ID</th>
-            <th style="width: 18%;">Họ tên</th>
+            <th style="width: 18%;">Họ Tên</th>
             <th style="width: 20%;">Email</th>
-            <th style="width: 12%;">Vai trò</th>
-            <th style="width: 12%;">Khu vực</th>
-            <th style="width: 10%;">Trạng thái</th>
-            <th style="width: 12%;">Ngày đăng ký</th>
-            <th style="width: 16%;">Hành động</th>
+            <th style="width: 12%;">Khu Vực</th>
+            <th style="width: 12%;">Vai Trò</th>
+            <th style="width: 10%;">Trạng Thái</th>
+            <th style="width: 12%;">Ngày Đăng Ký</th>
+            <th style="width: 16%;">Hành Động</th>
         </tr>
     </thead>
     <tbody>
@@ -33,8 +33,8 @@
                 <td>@(++stt)</td>
                 <td>@u.FullName</td>
                 <td>@u.Email</td>
-                <td>@u.RegionId</td>
-                <td>@u.RoleId</td>
+                <td>@u.RegionName</td>
+                <td>@u.RoleName</td>
                 <td>
                     @if (u.IsVerifiedResident)
                     {

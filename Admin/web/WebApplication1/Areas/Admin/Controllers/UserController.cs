@@ -22,17 +22,46 @@ namespace WebApplication1.Areas.Admin.Controllers
         // GET: /Admin/User
         public async Task<IActionResult> Index()
         {
-            var snap = await _db.Collection(COLL).GetSnapshotAsync();
-            var list = snap.Documents
-                           .Select(d =>
-                           {
-                               var dto = d.ConvertTo<UserDto>();
-                               dto.Id = d.Id;
-                               return dto;
-                           })
-                           .ToList();
+            var userSnap = await _db.Collection("users").GetSnapshotAsync();
+            var regionSnap = await _db.Collection("regions").GetSnapshotAsync();
+            var roleSnap = await _db.Collection("roles").GetSnapshotAsync();
+
+            // Đúng field "name" trong regions
+            var regionMap = regionSnap.Documents.ToDictionary(
+                d => d.Id,
+                d => d.GetValue<string>("name")
+            );
+
+            // Đúng field "roleName" trong roles
+            var roleMap = roleSnap.Documents.ToDictionary(
+                d => d.Id,
+                d => d.GetValue<string>("roleName")
+            );
+
+            var list = userSnap.Documents.Select(d =>
+            {
+                var dto = d.ConvertTo<UserDto>();
+                dto.Id = d.Id;
+
+                // Gán tên khu vực nếu tồn tại
+                if (!string.IsNullOrEmpty(dto.RegionId) && regionMap.TryGetValue(dto.RegionId, out var regionName))
+                {
+                    dto.RegionName = regionName;
+                }
+
+                // Gán tên vai trò nếu tồn tại
+                if (!string.IsNullOrEmpty(dto.RoleId) && roleMap.TryGetValue(dto.RoleId, out var roleName))
+                {
+                    dto.RoleName = roleName;
+                }
+
+                return dto;
+            }).ToList();
+
             return View(list);
         }
+
+
 
         // GET: /Admin/User/Create
         public async Task<IActionResult> Create()

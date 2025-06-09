@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using Google.Cloud.Firestore;
-using WebApplication1.Services;
+//using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +26,7 @@ Environment.SetEnvironmentVariable(
 
 // Đăng ký FirestoreDb và Seeder
 builder.Services.AddSingleton(_ => FirestoreDb.Create(projectId));
-builder.Services.AddTransient<FirestoreSeeder>();
+//builder.Services.AddTransient<FirestoreSeeder>();
 
 // --- Cấu hình MVC/Web ---
 builder.Services.AddControllersWithViews();
@@ -34,11 +34,11 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // --- Chạy seed ngay khi start ---
-using (var scope = app.Services.CreateScope())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<FirestoreSeeder>();
-    await seeder.SeedAsync();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var seeder = scope.ServiceProvider.GetRequiredService<FirestoreSeeder>();
+//    await seeder.SeedAsync();
+//}
 
 // --- Middleware & Routing ---
 if (!app.Environment.IsDevelopment())

@@ -38,10 +38,12 @@ body {
     border-radius: 0 0 16px 16px;
 }
 
+
     /* Phần thead màu xám nhẹ */
     .custom-table thead {
         background-color: #f9fafb;
     }
+
 
         /* Căn đều, kiểu chữ nhẹ */
         .custom-table thead th {
@@ -55,6 +57,7 @@ body {
     .custom-table tbody td {
         padding: 14px 16px;
         font-weight: 400;
+        font-size: 12px ;
         color: #374151;
         border-top: 1px solid #f1f1f1;
     }
