@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,6 +106,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void bindUserData(DocumentSnapshot snap) {
+        Log.d("DEBUG_PROFILE", "Gọi bindUserData()");
         String fullName      = snap.getString("fullName");
         String email         = snap.getString("email");
         String cccd          = snap.getString("cccd");
@@ -112,6 +114,9 @@ public class ProfileFragment extends Fragment {
         String addressDetail = snap.getString("addressDetail");
         String regionId      = snap.getString("regionId");
         String avatarUrl     = snap.getString("avatarUrl");
+
+        // 👇 Dòng kiểm tra dữ liệu bạn nên thêm:
+        Log.d("DEBUG_PROFILE", "cccd = " + cccd + ", phone = " + phoneNumber);
 
         binding.tvFullName.setText(fullName != null ? fullName : "");
         binding.tvEmail   .setText(email    != null ? email    : "");
