@@ -22,12 +22,12 @@
             android:id="@+id/imgAvatar"
             android:layout_width="153dp"
             android:layout_height="150dp"
-            android:clickable="true"
-            android:contentDescription="Avatar người dùng"
-            android:foreground="?attr/selectableItemBackground"
             android:padding="8dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_profile" />
+            android:src="@drawable/ic_profile"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:contentDescription="Avatar người dùng" />
 
         <TextView
             android:id="@+id/tvFullName"
@@ -46,12 +46,10 @@
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/bg_panel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerProfile"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 3. Thông tin cá nhân bên trong CardView -->
     <androidx.cardview.widget.CardView
