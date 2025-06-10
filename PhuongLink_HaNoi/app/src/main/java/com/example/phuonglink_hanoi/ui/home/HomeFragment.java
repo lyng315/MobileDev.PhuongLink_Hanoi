@@ -15,11 +15,17 @@ import com.example.phuonglink_hanoi.PostAdapter;
 import com.example.phuonglink_hanoi.databinding.FragmentHomeBinding;
 
 import java.util.ArrayList;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private HomeViewModel viewModel;
     private PostAdapter postAdapter;
+
+    private Handler handler = new Handler(); // handler cũng có thể là field
+    private Runnable searchRunnable;         // <-- thêm dòng này
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,6 +52,34 @@ public class HomeFragment extends Fragment {
 
         // Gọi method mới: chỉ lấy posts theo vùng user
         viewModel.loadPostsByUserRegion();
+
+        //tìm kiếm theo tiêu đề của khu vực user
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (searchRunnable != null) {
+                    handler.removeCallbacks(searchRunnable);
+                }
+
+                searchRunnable = () -> {
+                    String keyword = s.toString().trim();
+                    if (!keyword.isEmpty()) {
+                        viewModel.searchPostsByTitleInUserRegion(keyword);
+                    } else {
+                        viewModel.loadPostsByUserRegion();
+                    }
+                };
+
+                handler.postDelayed(searchRunnable, 300); // Delay 300ms sau khi dừng gõ
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
     }
 
     @Override

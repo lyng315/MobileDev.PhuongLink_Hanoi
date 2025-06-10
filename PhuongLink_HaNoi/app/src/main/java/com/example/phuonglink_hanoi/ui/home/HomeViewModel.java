@@ -42,6 +42,34 @@ public class HomeViewModel extends ViewModel {
                 .addOnFailureListener(Throwable::printStackTrace);
     }
 
+    /** Tìm kiếm bài viết theo tiêu đề trong khu vực của user */
+    public void searchPostsByTitleInUserRegion(String keyword) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        db.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener(userDoc -> {
+                    String regionId = userDoc.getString("regionId");
+                    if (regionId != null) {
+                        db.collection("posts")
+                                .whereEqualTo("targetRegionId", regionId)
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    List<Post> filtered = new ArrayList<>();
+                                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                        String title = doc.getString("title");
+                                        if (title != null && title.toLowerCase().contains(keyword.toLowerCase())) {
+                                            filtered.add(doc.toObject(Post.class));
+                                        }
+                                    }
+                                    posts.setValue(filtered);
+                                })
+                                .addOnFailureListener(Throwable::printStackTrace);
+                    }
+                })
+                .addOnFailureListener(Throwable::printStackTrace);
+    }
+
+
     private void mapSnapshotToPosts(QuerySnapshot snapshots) {
         List<Post> list = new ArrayList<>();
         for (DocumentSnapshot doc : snapshots.getDocuments()) {
@@ -63,4 +91,6 @@ public class HomeViewModel extends ViewModel {
         }
         posts.setValue(list);
     }
+
+
 }
