@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.phuonglink_hanoi.LoginActivity;
 import com.example.phuonglink_hanoi.R;
 import com.example.phuonglink_hanoi.databinding.FragmentProfileBinding;
+import com.example.phuonglink_hanoi.ChangePasswordActivity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,16 +33,15 @@ import com.google.firebase.storage.UploadTask;
 
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
-    private FirebaseFirestore db;
-    private FirebaseStorage storage;
-    private Uri avatarUri;
+    private FirebaseFirestore      db;
+    private FirebaseStorage        storage;
+    private Uri                    avatarUri;
 
-    // Launcher để chọn ảnh từ gallery
     private final ActivityResultLauncher<Intent> pickImageLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
-                        if (result.getResultCode() == getActivity().RESULT_OK &&
+                        if (result.getResultCode() == requireActivity().RESULT_OK &&
                                 result.getData() != null) {
                             avatarUri = result.getData().getData();
                             uploadAvatar();
@@ -97,6 +97,11 @@ public class ProfileFragment extends Fragment {
             pickImageLauncher.launch(pick);
         });
 
+        // Đổi mật khẩu
+        binding.itemChangePassword.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), ChangePasswordActivity.class));
+        });
+
         // Đăng xuất
         binding.itemLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -106,21 +111,16 @@ public class ProfileFragment extends Fragment {
     }
 
     private void bindUserData(DocumentSnapshot snap) {
-        Log.d("DEBUG_PROFILE", "Gọi bindUserData()");
+        Log.d("DEBUG_PROFILE", "bindUserData()");
         String fullName      = snap.getString("fullName");
         String email         = snap.getString("email");
-        String cccd          = snap.getString("cccd");
         String phoneNumber   = snap.getString("phoneNumber");
         String addressDetail = snap.getString("addressDetail");
         String regionId      = snap.getString("regionId");
         String avatarUrl     = snap.getString("avatarUrl");
 
-        // 👇 Dòng kiểm tra dữ liệu bạn nên thêm:
-        Log.d("DEBUG_PROFILE", "cccd = " + cccd + ", phone = " + phoneNumber);
-
         binding.tvFullName.setText(fullName != null ? fullName : "");
         binding.tvEmail   .setText(email    != null ? email    : "");
-        binding.tvCccd    .setText(cccd     != null ? cccd     : "");
         binding.tvPhone   .setText(phoneNumber != null ? phoneNumber : "");
 
         Glide.with(this)
@@ -158,7 +158,6 @@ public class ProfileFragment extends Fragment {
     private void uploadAvatar() {
         if (avatarUri == null) return;
 
-        // Khai báo final để dùng trong lambda
         final String uid = FirebaseAuth
                 .getInstance()
                 .getCurrentUser()
@@ -174,12 +173,10 @@ public class ProfileFragment extends Fragment {
                     return ref.getDownloadUrl();
                 })
                 .addOnSuccessListener(downloadUri -> {
-                    // Cập nhật Firestore
                     FirebaseFirestore.getInstance()
                             .collection("users")
                             .document(uid)
                             .update("avatarUrl", downloadUri.toString());
-                    // Hiển thị ngay avatar mới
                     Glide.with(this)
                             .load(downloadUri)
                             .placeholder(R.drawable.ic_profile)

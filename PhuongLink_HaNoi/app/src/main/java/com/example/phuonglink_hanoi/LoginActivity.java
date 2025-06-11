@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +15,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
+
     private TextView tvError;
     private TextInputEditText edtUsername;
     private TextInputEditText edtPassword;
@@ -31,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Khởi tạo Firebase
+        // Khởi tạo FirebaseAuth
         auth = FirebaseAuth.getInstance();
 
         // Ánh xạ view
@@ -42,24 +44,21 @@ public class LoginActivity extends AppCompatActivity {
         tvForgot     = findViewById(R.id.tvForgot);
         tvSignupLink = findViewById(R.id.tvSignupLink);
 
-        // Ẩn khung lỗi ban đầu
-        tvError.setVisibility(View.GONE);
+        tvError.setVisibility(TextView.GONE);
 
-        // Chuyển sang màn hình Quên mật khẩu
+        // Chuyển sang màn Quên mật khẩu
         tvForgot.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
         });
 
-        // Chuyển sang màn hình Đăng ký
+        // Chuyển sang màn Đăng ký
         tvSignupLink.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
 
         // Xử lý đăng nhập
         btnLogin.setOnClickListener(v -> {
-            String email = edtUsername.getText().toString().trim();
+            String email    = edtUsername.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
 
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
@@ -69,9 +68,20 @@ public class LoginActivity extends AppCompatActivity {
 
             auth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        // Đăng nhập thành công → về MainActivity
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
+                        FirebaseUser user = auth.getCurrentUser();
+                        if (user != null && user.isEmailVerified()) {
+                            // Email đã xác thực → vào Main
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        } else {
+                            // Chưa xác thực → sign out, nhắc xác thực
+                            auth.signOut();
+                            Toast.makeText(
+                                    LoginActivity.this,
+                                    "Vui lòng kiểm tra email để xác thực trước khi đăng nhập.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
                     })
                     .addOnFailureListener(e -> {
                         Log.e("LoginActivity", "signInWithEmail:failure", e);
@@ -86,11 +96,8 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Hiển thị thông báo lỗi lên đầu form
-     */
     private void showError(String message) {
         tvError.setText(message);
-        tvError.setVisibility(View.VISIBLE);
+        tvError.setVisibility(TextView.VISIBLE);
     }
 }

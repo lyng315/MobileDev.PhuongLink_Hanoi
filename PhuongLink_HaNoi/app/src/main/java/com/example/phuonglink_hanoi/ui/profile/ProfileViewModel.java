@@ -6,14 +6,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileViewModel extends ViewModel {
     public static class ProfileData {
         public String fullName;
         public String email;
-        public String cccd;
         public String phoneNumber;
         public String addressDetail;
         public String regionId;
@@ -38,7 +36,6 @@ public class ProfileViewModel extends ViewModel {
                     ProfileData d = new ProfileData();
                     d.fullName      = snap.getString("fullName");
                     d.email         = snap.getString("email");
-                    d.cccd          = snap.getString("cccd");
                     d.phoneNumber   = snap.getString("phoneNumber");
                     d.addressDetail = snap.getString("addressDetail");
                     d.regionId      = snap.getString("regionId");

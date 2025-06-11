@@ -51,10 +51,15 @@
         </activity>
         <activity
             android:name=".RegisterActivity"
-            android:label="Đăng k"
+            android:label="Đăng kí"
             android:parentActivityName=".LoginActivity">
 
         </activity>
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:label="Đổi mật khẩu"
+            android:parentActivityName=".MainActivity" />
+
 
     </application>
 
