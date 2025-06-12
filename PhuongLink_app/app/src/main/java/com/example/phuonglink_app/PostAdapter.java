@@ -152,4 +152,5 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         postList = newList;
         notifyDataSetChanged();
     }
+
 }

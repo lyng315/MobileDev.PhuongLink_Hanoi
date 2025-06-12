@@ -16,4 +16,12 @@
     <!-- Màu nền panel trắng -->
     <color name="panelBackground">#F5F5F5</color>
     <color name="grayText">#666666</color>
+
+    <!--Màu sử dụng trong filter-->
+    <color name="black1">#222222</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="gray_border">#DDDDDD</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="teal_200">#03DAC5</color>
+
 </resources>

@@ -1,10 +1,13 @@
 package com.example.phuonglink_app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -12,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -33,13 +37,14 @@ public class HomeActivity extends AppCompatActivity {
     private List<Post> postList;
     private FirebaseFirestore db;
     private EditText etSearch;
+    private FrameLayout contentContainer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         etSearch = findViewById(R.id.etSearch);
-
+        contentContainer = findViewById(R.id.panel);
         // 1. Khởi tạo Firestore
         db = FirebaseFirestore.getInstance();
 
@@ -71,6 +76,14 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
+        //xử lý lọc
+        MaterialButton btnFilter = findViewById(R.id.btnFilter);
+        btnFilter.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, FilterActivity.class);
+            startActivityForResult(intent, 100);  // 100 là mã request
+        });
+
     }
 
     private void loadPostsFromFirestore() {
@@ -137,4 +150,64 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 });
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
+            String category = data.getStringExtra("category");
+            String levelStr = data.getStringExtra("level");
+
+            // level trong FilterActivity là String, bạn nên convert nó sang int (nếu urgencyLevel là int)
+            int urgencyLevel = mapLevelStringToInt(levelStr);
+
+            filterPosts(category, urgencyLevel);
+        }
+    }
+    private int mapLevelStringToInt(String levelStr) {
+        switch (levelStr) {
+            case "Khẩn cấp":
+                return 3;
+            case "Quan trọng":
+                return 2;
+            case "Bình thường":
+                return 1;
+            default:
+                return 1;
+        }
+    }
+
+
+    private void filterPosts(String category, int urgencyLevel) {
+        db.collection("posts")
+                .whereEqualTo("categoryId", category)
+                .whereEqualTo("urgencyLevel", urgencyLevel)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("HomeActivity", "Lỗi khi lọc bài viết", e);
+                        Toast.makeText(HomeActivity.this, "Không thể tải bài viết lọc", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    postList.clear();
+                    if (snapshots != null) {
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            if (doc.exists()) {
+                                String id = doc.getId();
+                                String title = doc.getString("title");
+                                Long ul = doc.getLong("urgencyLevel");
+                                int urgencyLevelPost = ul != null ? ul.intValue() : 1;
+                                Timestamp createdAt = doc.getTimestamp("createdAt");
+                                String thumbUrl = doc.getString("thumbnailUrl");
+                                if (thumbUrl == null) thumbUrl = "";
+
+                                postList.add(new Post(id, title, urgencyLevelPost, createdAt, thumbUrl));
+                            }
+                        }
+                        postAdapter.notifyDataSetChanged();
+                    }
+                });
+    }
+
+
 }
