@@ -9,6 +9,7 @@ public class Post {
     private Timestamp createdAt;
     private String thumbnailUrl;
     private String targetRegionId;  // ← đổi tên cho khớp Firestore
+//    private String categoryId;
 
     public Post() {}
 
@@ -24,6 +25,7 @@ public class Post {
         this.createdAt = createdAt;
         this.thumbnailUrl = thumbnailUrl;
         this.targetRegionId = targetRegionId;
+//        this.categoryId = categoryId;
     }
 
     public String getId() {
@@ -67,4 +69,21 @@ public class Post {
     public void setTargetRegionId(String targetRegionId) {
         this.targetRegionId = targetRegionId;
     }
+//    public String getUrgency() {
+//        switch (urgencyLevel) {
+//            case 3: return "Khẩn cấp";
+//            case 2: return "Quan trọng";
+//            case 1:
+//            default: return "Bình thường";
+//        }
+//    }
+
+//    public String getCategoryId() {
+//        return categoryId;
+//    }
+//
+//    public void setCategoryId(String categoryId) {
+//        this.categoryId = categoryId;
+//    }
+
 }

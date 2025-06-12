@@ -10,4 +10,9 @@
     <color name="colorSeverityImportant">#FFA000</color> <!-- ví dụ màu cam -->
     <color name="colorSeverityNormal">#4CAF50</color>    <!-- ví dụ màu xanh lá -->
 
+    <!--Màu sử dụng trong filter-->
+    <color name="black1">#222222</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="gray_border">#DDDDDD</color>
+    <color name="colorOnPrimary">#FFFFFFFF</color>
 </resources>

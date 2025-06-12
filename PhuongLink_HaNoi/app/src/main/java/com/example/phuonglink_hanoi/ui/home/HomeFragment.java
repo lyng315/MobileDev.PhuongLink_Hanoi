@@ -1,31 +1,38 @@
 package com.example.phuonglink_hanoi.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.phuonglink_hanoi.FilterActivity;
 import com.example.phuonglink_hanoi.PostAdapter;
 import com.example.phuonglink_hanoi.databinding.FragmentHomeBinding;
 
 import java.util.ArrayList;
-import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private HomeViewModel viewModel;
     private PostAdapter postAdapter;
 
-    private Handler handler = new Handler(); // handler cũng có thể là field
-    private Runnable searchRunnable;         // <-- thêm dòng này
+    private Handler handler = new Handler();
+    private Runnable searchRunnable;
+
+    private String selectedCategoryId = null;
+    private String selectedUrgencyLevel = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -50,13 +57,13 @@ public class HomeFragment extends Fragment {
             postAdapter.updateList(posts);
         });
 
-        // Gọi method mới: chỉ lấy posts theo vùng user
+        // Tải toàn bộ bài viết ban đầu trong khu vực người dùng
         viewModel.loadPostsByUserRegion();
 
-        //tìm kiếm theo tiêu đề của khu vực user
+        // Tìm kiếm theo tiêu đề
         binding.etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -73,14 +80,31 @@ public class HomeFragment extends Fragment {
                     }
                 };
 
-                handler.postDelayed(searchRunnable, 300); // Delay 300ms sau khi dừng gõ
+                handler.postDelayed(searchRunnable, 300);
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
         });
 
+        // Nút lọc
+        binding.btnFilter.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), FilterActivity.class);
+            filterLauncher.launch(intent);
+        });
     }
+
+    // Nhận dữ liệu lọc từ FilterActivity
+    private final ActivityResultLauncher<Intent> filterLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
+                    Intent data = result.getData();
+                    selectedCategoryId = data.getStringExtra("categoryId");
+                    selectedUrgencyLevel = data.getStringExtra("urgencyLevel");
+
+                    // Gọi ViewModel lọc bài viết
+                    viewModel.filterPostsByCategoryAndUrgency(selectedCategoryId, selectedUrgencyLevel);
+                }
+            }
+    );
 
     @Override
     public void onDestroyView() {
