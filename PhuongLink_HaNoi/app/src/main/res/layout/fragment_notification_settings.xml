@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#054DB3"
+    tools:context=".ui.notifications.NotificationSettingsFragment">
+
+    <!-- 1. HEADER -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg_header"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="134dp"
+            android:layout_height="88dp"
+            android:contentDescription="@string/desc_logo"
+            android:src="@drawable/hanoi" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="PhuongLink HaNoi"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 2. Title + Back Icon -->
+    <LinearLayout
+        android:id="@+id/notificationTitleLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:translationY="12dp"
+        android:background="@drawable/bg_notification_title"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="22dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="14dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="Quay lại"
+            android:src="@drawable/ic_arrow_back_black" />
+
+        <TextView
+            android:id="@+id/tvNotificationTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cài đặt thông báo"
+            android:textColor="#000000"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 3. Nội dung ScrollView -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#ECECEC"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/notificationTitleLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Switch -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Bật thông báo"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000" />
+
+                <Switch
+                    android:id="@+id/switchEnableNotifications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- Checkboxes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Danh mục quan tâm"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <CheckBox
+                android:id="@+id/cbEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sự kiện cộng đồng"
+                android:checked="true"
+                android:textColor="#000000" />
+
+            <CheckBox
+                android:id="@+id/cbGeneral"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thông báo chung"
+                android:checked="true"
+                android:textColor="#000000" />
+
+            <CheckBox
+                android:id="@+id/cbSecurity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cảnh báo an ninh"
+                android:checked="true"
+                android:textColor="#000000" />
+
+            <CheckBox
+                android:id="@+id/cbService"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cảnh báo dịch vụ"
+                android:checked="true"
+                android:textColor="#000000" />
+
+            <!-- RadioGroup -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mức độ ưu tiên"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000" />
+
+            <RadioGroup
+                android:id="@+id/rgPriority"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/rbNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bình thường"
+                    android:textColor="#000000" />
+
+                <RadioButton
+                    android:id="@+id/rbImportant"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quan trọng"
+                    android:checked="true"
+                    android:textColor="#000000" />
+
+                <RadioButton
+                    android:id="@+id/rbUrgent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khẩn cấp"
+                    android:textColor="#000000" />
+            </RadioGroup>
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,39 @@
+<resources>
+    <style name="FormLabel">
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textColor">#333333</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="FormInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+    <style name="FilterButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="backgroundTint">@color/filter_button_background</item>
+        <item name="strokeColor">@color/gray_border</item>
+        <item name="strokeWidth">1.5dp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textColor">@color/filter_button_text_color</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="elevation">2dp</item>
+    </style>
+    <style name="UrgencyLabel">
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+</resources>
