@@ -1,0 +1,50 @@
+﻿@model WebApplication1.Models.ViewModels.CommunityDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container my-4">
+    <h2 class="fw-bold">Bảng tin cộng đồng</h2>
+    <p class="text-muted">Cập nhật thông tin mới nhất trong khu vực</p>
+
+    <div class="row g-4 my-3">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="mb-2 fs-3 text-primary"><i class="bi bi-journal-text"></i></div>
+                    <div class="fs-5 fw-bold">@Model.TotalPosts</div>
+                    <div class="text-muted">Bài viết mới</div>
+                    <div class="mt-1 text-@(Model.GrowthPostPercent >= 0 ? "success" : "danger")">
+                        <small>@(Model.GrowthPostPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.GrowthPostPercent)% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="mb-2 fs-3 text-warning"><i class="bi bi-chat-dots"></i></div>
+                    <div class="fs-5 fw-bold">@Model.TotalComments</div>
+                    <div class="text-muted">Bình luận mới</div>
+                    <div class="mt-1 text-@(Model.GrowthCommentPercent >= 0 ? "success" : "danger")">
+                        <small>@(Model.GrowthCommentPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.GrowthCommentPercent)% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="mb-2 fs-3 text-success"><i class="bi bi-people"></i></div>
+                    <div class="fs-5 fw-bold">@Model.TotalUsers</div>
+                    <div class="text-muted">Thành viên mới</div>
+                    <div class="mt-1 text-@(Model.GrowthUserPercent >= 0 ? "success" : "danger")">
+                        <small>@(Model.GrowthUserPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.GrowthUserPercent)% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

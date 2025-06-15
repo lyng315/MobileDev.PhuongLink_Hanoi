@@ -1,0 +1,15 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-Secrets",
+      "appliesTo": "Secrets/",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-WebApplication1",
+      "appliesTo": "/",
+      "type": "launch"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+﻿@model IEnumerable<WebApplication1.Models.Dtos.PostCategoryDto>
+@* @{
+    ViewData["Title"] = "Danh Sách Danh Mục Tin";
+    var keyword = ViewBag.Keyword as string ?? "";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-area="Admin" asp-controller="PostCategory" asp-action="Index" method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <input type="text" name="keyword" value="@keyword" class="form-control" placeholder="Tìm kiếm..." />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Tìm</button>
+    </div>
+    <div class="col-auto">
+        <a asp-area="Admin" asp-controller="PostCategory" asp-action="Create" class="btn btn-success">Thêm mới</a>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tên danh mục</th>
+            <th>Hành Động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>
+                    <a asp-area="Admin" asp-controller="PostCategory" asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Sửa</a>
+                    <form asp-area="Admin" asp-controller="PostCategory" asp-action="Delete" asp-route-id="@c.Id" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?');">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@
+
+@{
+    ViewData["Title"] = "Quản lý Danh Mục";
+    var stt = 0;
+}
+
+<h2 class="fw-bold text-dark mb-4">@ViewData["Title"]</h2>
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-area="Admin" asp-controller="PostCategory" asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Tạo mới
+    </a>
+</div>
+<div class="custom-table-container">
+    <table class="table custom-table">
+        <thead class="table-light">
+            <tr>
+                <th>Stt</th>
+                <th>Tên Danh Mục</th>
+                <th>Hành Động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@(++stt)</td>
+                    <td>@u.Name</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="PostCategory" asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-outline-success me-1" title="Sửa">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form asp-area="Admin" asp-controller="PostCategory" asp-action="Delete" asp-route-id="@u.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

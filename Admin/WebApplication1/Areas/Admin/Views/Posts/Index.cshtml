@@ -1,0 +1,49 @@
+﻿@model IEnumerable<WebApplication1.Models.Dtos.PostsDTO>  
+@{  
+    ViewData["Title"] = "Quản lý Bài Viết";  
+    var stt = 0;  
+}  
+
+<h2 class="fw-bold text-dark mb-4">@ViewData["Title"]</h2>  
+
+
+<div class="custom-table-container">  
+    <table class="table custom-table">  
+        <thead class="table-light">  
+            <tr>  
+                <th>STT</th>  
+                <th>Tiêu đề</th>  
+                <th>Tác giả</th>  
+                <th>Danh mục</th>  
+                <th>Khu vực</th>   
+                <th>Ngày tạo</th>  
+                <th>Hành động</th>  
+            </tr>  
+        </thead>  
+        <tbody>  
+            @foreach (var p in Model)  
+            {  
+                <tr>  
+                    <td>@(++stt)</td>  
+                    <td>@p.Title</td>  
+                    <td>@p.AuthorName</td>  
+                    <td>@p.CategoryName</td>  
+                    <td>@p.RegionName</td>  
+                    <td>
+                        @p.CreatedAt.ToDateTime().ToString("dd/MM/yyyy")
+                    </td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary me-1" title="Xem">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <form asp-action="Delete" asp-route-id="@p.Id" method="post" class="d-inline">  
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xác nhận xóa?');">  
+                                <i class="bi bi-trash"></i>  
+                            </button>  
+                        </form>  
+                    </td>  
+                </tr>  
+            }  
+        </tbody>  
+    </table>  
+</div>
