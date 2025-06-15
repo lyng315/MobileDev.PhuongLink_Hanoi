@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,16 +32,16 @@ import com.google.firebase.storage.UploadTask;
 
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
-    private FirebaseFirestore      db;
-    private FirebaseStorage        storage;
-    private Uri                    avatarUri;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
+    private Uri avatarUri;
 
     private final ActivityResultLauncher<Intent> pickImageLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
-                        if (result.getResultCode() == requireActivity().RESULT_OK &&
-                                result.getData() != null) {
+                        if (result.getResultCode() == requireActivity().RESULT_OK
+                                && result.getData() != null) {
                             avatarUri = result.getData().getData();
                             uploadAvatar();
                         }
@@ -51,8 +50,8 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -62,13 +61,12 @@ public class ProfileFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        db      = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-            Toast.makeText(getContext(),
-                    "Chưa đăng nhập", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Chưa đăng nhập", Toast.LENGTH_SHORT).show();
             return;
         }
         String userId = user.getUid();
@@ -98,9 +96,9 @@ public class ProfileFragment extends Fragment {
         });
 
         // Đổi mật khẩu
-        binding.itemChangePassword.setOnClickListener(v -> {
-            startActivity(new Intent(requireContext(), ChangePasswordActivity.class));
-        });
+        binding.itemChangePassword.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), ChangePasswordActivity.class))
+        );
 
         // Đăng xuất
         binding.itemLogout.setOnClickListener(v -> {
@@ -111,17 +109,17 @@ public class ProfileFragment extends Fragment {
     }
 
     private void bindUserData(DocumentSnapshot snap) {
-        Log.d("DEBUG_PROFILE", "bindUserData()");
-        String fullName      = snap.getString("fullName");
-        String email         = snap.getString("email");
-        String phoneNumber   = snap.getString("phoneNumber");
-        String addressDetail = snap.getString("addressDetail");
-        String regionId      = snap.getString("regionId");
-        String avatarUrl     = snap.getString("avatarUrl");
+        // Đảm bảo các biến là final để dùng trong lambda
+        final String fullName = snap.getString("fullName");
+        final String email = snap.getString("email");
+        final String phoneNumber = snap.getString("phoneNumber");
+        final String addressDetail = snap.getString("addressDetail");
+        final String regionId = snap.getString("regionId");
+        final String avatarUrl = snap.getString("avatarUrl");
 
         binding.tvFullName.setText(fullName != null ? fullName : "");
-        binding.tvEmail   .setText(email    != null ? email    : "");
-        binding.tvPhone   .setText(phoneNumber != null ? phoneNumber : "");
+        binding.tvEmail.setText(email != null ? email : "");
+        binding.tvPhone.setText(phoneNumber != null ? phoneNumber : "");
 
         Glide.with(this)
                 .load(avatarUrl)
@@ -134,7 +132,7 @@ public class ProfileFragment extends Fragment {
                     .document(regionId)
                     .get()
                     .addOnSuccessListener(doc -> {
-                        String regionName = doc.getString("name");
+                        final String regionName = doc.getString("name");
                         String addr = "";
                         if (regionName != null) addr += regionName;
                         if (addressDetail != null && !addressDetail.isEmpty()) {
@@ -157,7 +155,6 @@ public class ProfileFragment extends Fragment {
 
     private void uploadAvatar() {
         if (avatarUri == null) return;
-
         final String uid = FirebaseAuth
                 .getInstance()
                 .getCurrentUser()
@@ -173,8 +170,7 @@ public class ProfileFragment extends Fragment {
                     return ref.getDownloadUrl();
                 })
                 .addOnSuccessListener(downloadUri -> {
-                    FirebaseFirestore.getInstance()
-                            .collection("users")
+                    db.collection("users")
                             .document(uid)
                             .update("avatarUrl", downloadUri.toString());
                     Glide.with(this)

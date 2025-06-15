@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import android.util.Log;
+
 import com.example.phuonglink_hanoi.Post;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class HomeViewModel extends ViewModel {
+    private static final String TAG = "HomeViewModel";
     private final MutableLiveData<List<Post>> posts = new MutableLiveData<>(new ArrayList<>());
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -24,8 +27,14 @@ public class HomeViewModel extends ViewModel {
         return posts;
     }
 
-    /** Lấy regionId từ user hiện tại */
+    /**
+     * Lấy regionId từ user hiện tại và xử lý tiếp
+     */
     private void getUserRegion(Consumer<String> onRegionReceived) {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            posts.setValue(new ArrayList<>());
+            return;
+        }
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db.collection("users").document(uid)
                 .get()
@@ -38,117 +47,100 @@ public class HomeViewModel extends ViewModel {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    e.printStackTrace();
+                    Log.e(TAG, "Error fetching user region", e);
                     posts.setValue(new ArrayList<>());
                 });
     }
 
-    /** Load bài viết theo khu vực của user */
+    /**
+     * Load toàn bộ bài viết theo region của user, sắp xếp giảm dần theo createdAt
+     */
     public void loadPostsByUserRegion() {
-        getUserRegion(regionId -> {
-            db.collection("posts")
-                    .whereEqualTo("targetRegionId", regionId)
-                    .orderBy("createdAt", Query.Direction.DESCENDING)
-                    .get()
-                    .addOnSuccessListener(this::mapSnapshotToPosts)
-                    .addOnFailureListener(Throwable::printStackTrace);
-        });
+        getUserRegion(regionId ->
+                db.collection("posts")
+                        .whereEqualTo("targetRegionId", regionId)
+                        .orderBy("createdAt", Query.Direction.DESCENDING)
+                        .get()
+                        .addOnSuccessListener(this::mapSnapshotToPosts)
+                        .addOnFailureListener(e -> Log.e(TAG, "Error loading posts", e))
+        );
     }
 
-    /** Tìm kiếm bài viết theo tiêu đề trong khu vực của user */
+    /**
+     * Tìm kiếm bài viết theo title trong region của user
+     */
     public void searchPostsByTitleInUserRegion(String keyword) {
-        getUserRegion(regionId -> {
-            db.collection("posts")
-                    .whereEqualTo("targetRegionId", regionId)
-                    .get()
-                    .addOnSuccessListener(querySnapshot -> {
-                        List<Post> filtered = new ArrayList<>();
-                        for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                            String title = doc.getString("title");
-                            if (title != null && title.toLowerCase().contains(keyword.toLowerCase())) {
-                                filtered.add(doc.toObject(Post.class));
-                            }
-                        }
-                        posts.setValue(filtered);
-                    })
-                    .addOnFailureListener(Throwable::printStackTrace);
-        });
-    }
-
-    /** Lọc bài viết theo categoryId và urgencyLevel trong khu vực của user */
-    public void filterPostsByCategoryAndUrgency(String categoryId, String urgencyLevelStr) {
-        getUserRegion(regionId -> {
-            db.collection("posts")
-                    .whereEqualTo("targetRegionId", regionId)
-                    .get()
-                    .addOnSuccessListener(snapshot -> {
-                        List<Post> filteredPosts = new ArrayList<>();
-
-                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                            String docCategoryId = doc.getString("categoryId");
-                            Long urgencyLong = doc.getLong("urgencyLevel");
-                            int urgency = urgencyLong != null ? urgencyLong.intValue() : -1;
-
-                            boolean matchesCategory = (categoryId == null || categoryId.isEmpty()) || categoryId.equals(docCategoryId);
-                            boolean matchesUrgency = true;
-
-                            if (urgencyLevelStr != null && !urgencyLevelStr.isEmpty()) {
-                                try {
-                                    int urgencyLevel = Integer.parseInt(urgencyLevelStr);
-                                    matchesUrgency = urgency == urgencyLevel;
-                                } catch (NumberFormatException e) {
-                                    e.printStackTrace();
-                                    matchesUrgency = false;
+        getUserRegion(regionId ->
+                db.collection("posts")
+                        .whereEqualTo("targetRegionId", regionId)
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            List<Post> filtered = new ArrayList<>();
+                            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                Post p = doc.toObject(Post.class);
+                                if (p != null) {
+                                    p.setId(doc.getId());
+                                    String title = p.getTitle();
+                                    if (title != null && title.toLowerCase().contains(keyword.toLowerCase())) {
+                                        filtered.add(p);
+                                    }
                                 }
                             }
-
-                            if (matchesCategory && matchesUrgency) {
-                                String id = doc.getId();
-                                String title = doc.getString("title");
-                                Timestamp createdAt = doc.getTimestamp("createdAt");
-                                String thumbnailUrl = doc.getString("thumbnailUrl");
-                                String targetRegion = doc.getString("targetRegionId");
-
-                                filteredPosts.add(new Post(
-                                        id,
-                                        title != null ? title : "",
-                                        urgency,
-                                        createdAt != null ? createdAt : Timestamp.now(),
-                                        thumbnailUrl != null ? thumbnailUrl : "",
-                                        targetRegion != null ? targetRegion : ""
-                                ));
-                            }
-                        }
-
-                        // Sắp xếp theo thời gian giảm dần
-                        filteredPosts.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
-                        posts.setValue(filteredPosts);
-                    })
-                    .addOnFailureListener(Throwable::printStackTrace);
-        });
+                            posts.setValue(filtered);
+                        })
+                        .addOnFailureListener(e -> Log.e(TAG, "Error searching posts", e))
+        );
     }
 
+    /**
+     * Lọc bài viết theo categoryId và urgencyLevel trong region của user
+     */
+    public void filterPostsByCategoryAndUrgency(String categoryId, String urgencyLevelStr) {
+        getUserRegion(regionId ->
+                db.collection("posts")
+                        .whereEqualTo("targetRegionId", regionId)
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            List<Post> filtered = new ArrayList<>();
+                            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                Post p = doc.toObject(Post.class);
+                                if (p != null) {
+                                    p.setId(doc.getId());
+                                    boolean matchesCategory = (categoryId == null || categoryId.isEmpty())
+                                            || categoryId.equals(doc.getString("categoryId"));
+                                    boolean matchesUrgency = true;
+                                    if (urgencyLevelStr != null && !urgencyLevelStr.isEmpty()) {
+                                        try {
+                                            matchesUrgency = p.getUrgencyLevel() == Integer.parseInt(urgencyLevelStr);
+                                        } catch (NumberFormatException e) {
+                                            Log.e(TAG, "Invalid urgency level", e);
+                                            matchesUrgency = false;
+                                        }
+                                    }
+                                    if (matchesCategory && matchesUrgency) {
+                                        filtered.add(p);
+                                    }
+                                }
+                            }
+                            // Sắp xếp giảm dần theo thời gian tạo
+                            filtered.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
+                            posts.setValue(filtered);
+                        })
+                        .addOnFailureListener(e -> Log.e(TAG, "Error filtering posts", e))
+        );
+    }
 
-    /** Chuyển dữ liệu từ Firestore sang danh sách Post */
+    /**
+     * Map QuerySnapshot thành danh sách Post và gắn id
+     */
     private void mapSnapshotToPosts(QuerySnapshot snapshots) {
         List<Post> list = new ArrayList<>();
         for (DocumentSnapshot doc : snapshots.getDocuments()) {
-            String id = doc.getId();
-            String title = doc.getString("title");
-            Long ul = doc.getLong("urgencyLevel");
-            int urgency = ul != null ? ul.intValue() : 1;
-            Timestamp createdAt = doc.getTimestamp("createdAt");
-            String thumbnailUrl = doc.getString("thumbnailUrl");
-            String targetRegionId = doc.getString("targetRegionId");
-
-            list.add(new Post(
-                    id,
-                    title != null ? title : "",
-                    urgency,
-                    createdAt != null ? createdAt : Timestamp.now(),
-                    thumbnailUrl != null ? thumbnailUrl : "",
-                    targetRegionId != null ? targetRegionId : ""
-            ));
+            Post p = doc.toObject(Post.class);
+            if (p != null) {
+                p.setId(doc.getId());
+                list.add(p);
+            }
         }
         posts.setValue(list);
     }

@@ -14,5 +14,16 @@
     <string name="desc_logo">Logo PhuongLink Hà Nội</string>
     <string name="desc_favorite">Yêu thích</string>
     <string name="desc_comment">Bình luận</string>
+    <string name="title_post_details">Chi tiết bài viết</string>
+    <string name="author_avatar">Avatar tác giả</string>
+    <string name="author_name_default">Tên tác giả</string>
+    <string name="urgency_normal">Bình thường</string>
+    <string name="post_time_default">20 phút trước</string>
+    <string name="post_title_default">Tiêu đề bài viết</string>
+    <string name="post_content_default">Nội dung chi tiết của bài viết...</string>
+    <string name="post_image">Ảnh bài viết</string>
+    <string name="action_like">Thích</string>
+    <string name="action_comment">Bình luận</string>
+
 
 </resources>
