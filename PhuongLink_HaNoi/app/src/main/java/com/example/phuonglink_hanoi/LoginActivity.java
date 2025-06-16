@@ -1,6 +1,7 @@
 package com.example.phuonglink_hanoi;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -70,6 +71,15 @@ public class LoginActivity extends AppCompatActivity {
                     .addOnSuccessListener(authResult -> {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null && user.isEmailVerified()) {
+                            // Ghi userId + avatar vào SharedPreferences
+                            String userId = user.getUid();  // hoặc user.getEmail() nếu bạn muốn dùng email làm ID
+                            String avatarUrl = user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
+
+                            SharedPreferences prefs = getSharedPreferences("userPrefs", MODE_PRIVATE);
+                            prefs.edit()
+                                    .putString("userId", userId)
+                                    .putString("avatarUrl", avatarUrl) // có thể là null
+                                    .apply();
                             // Email đã xác thực → vào Main
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();

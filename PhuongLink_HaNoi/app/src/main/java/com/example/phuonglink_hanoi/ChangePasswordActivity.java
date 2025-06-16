@@ -103,7 +103,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<Void> updateTask) {
                                         if (updateTask.isSuccessful()) {
                                             // 🟢 Ghi thông báo đổi mật khẩu thành công vào SharedPreferences
-                                            SharedPreferences notiPrefs = getSharedPreferences("notifications", MODE_PRIVATE);
+                                            String userId = Utils.getCurrentUserId(ChangePasswordActivity.this);
+                                            SharedPreferences notiPrefs = getSharedPreferences("notifications_" + userId, MODE_PRIVATE);
+
                                             String existingLogs = notiPrefs.getString("notification_list", "");
 
                                             // Thêm thông báo mới ở đầu danh sách

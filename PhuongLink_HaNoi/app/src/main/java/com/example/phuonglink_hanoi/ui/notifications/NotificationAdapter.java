@@ -3,6 +3,7 @@ package com.example.phuonglink_hanoi.ui.notifications;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,10 +22,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView imgAvatar; // Avatar người dùng
         TextView tvNotification;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            imgAvatar = itemView.findViewById(R.id.imgAvatar);
             tvNotification = itemView.findViewById(R.id.tvNotification);
         }
     }
@@ -39,7 +42,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull NotificationAdapter.ViewHolder holder, int position) {
-        holder.tvNotification.setText(notificationList.get(position));
+        String message = notificationList.get(position);
+
+        holder.tvNotification.setText(message);
+        holder.imgAvatar.setImageResource(R.drawable.ic_profile); // ảnh mặc định
     }
 
     @Override

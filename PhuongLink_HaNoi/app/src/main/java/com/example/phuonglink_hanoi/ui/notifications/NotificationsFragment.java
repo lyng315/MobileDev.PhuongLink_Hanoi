@@ -60,7 +60,9 @@ public class NotificationsFragment extends Fragment {
         }
 
         // Load lại dữ liệu
-        SharedPreferences prefs = requireContext().getSharedPreferences("notifications", Context.MODE_PRIVATE);
+        String userId = com.example.phuonglink_hanoi.Utils.getCurrentUserId(requireContext());
+        SharedPreferences prefs = requireContext().getSharedPreferences("notifications_" + userId, Context.MODE_PRIVATE);
+
         String stored = prefs.getString("notification_list", "");
         Log.d("NOTI_READ", stored);
 
