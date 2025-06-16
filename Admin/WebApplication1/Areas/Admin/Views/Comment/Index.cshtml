@@ -1,0 +1,85 @@
+﻿@model IEnumerable<WebApplication1.Models.Dtos.CommentDto>
+@{
+    ViewData["Title"] = "Danh Sách Bình Luận";
+}
+
+<h2 class="fw-bold text-dark mb-4">@ViewData["Title"]</h2>
+
+<div class="custom-table-container">
+    <table class="table custom-table table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>Tiêu Đề Bài Đăng</th>
+                <th>Email Người Bình Luận</th>
+                <th>Nội Dung</th>
+                <th>Thời Gian Tạo</th>
+                <th>Hành Động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.PostTitle</td>
+                    <td>@c.AuthorEmail</td>
+                    <td>@c.Content</td>
+                    <td>@c.CreatedAtDate.ToLocalTime().ToString("g")</td>
+                    <td>
+                        <form asp-area="Admin"
+                              asp-controller="Comment"
+                              asp-action="Delete"
+                              asp-route-id="@c.Id"
+                              method="post"
+                              class="d-inline">
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    title="Xóa"
+                                    onclick="return confirm('Xác nhận xóa bình luận này?');">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@* <h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tiêu Đề Bài Đăng</th>
+            <th>Email Người Bình Luận</th>
+            <th>Nội Dung</th>
+            <th>Thời Gian Tạo</th>
+            <th>Hành Động</th>
+        </tr>
+    </thead>
+    <tbody
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.PostTitle</td>
+                <td>@c.AuthorEmail</td>
+                <td>@c.Content</td>
+                <td>@c.CreatedAtDate.ToLocalTime().ToString("g")</td>
+                <td>
+                    <form asp-area="Admin"
+                          asp-controller="Comment"
+                          asp-action="Delete"
+                          asp-route-id="@c.Id"
+                          method="post"
+                          style="display:inline">
+                        <button type="submit"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('Xác nhận xóa bình luận này?');">
+                            Xóa
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@

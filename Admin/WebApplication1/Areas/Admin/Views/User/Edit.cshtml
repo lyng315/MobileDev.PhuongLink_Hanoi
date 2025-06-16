@@ -1,0 +1,71 @@
+﻿@model WebApplication1.Models.Dtos.UserDto
+@{
+    ViewData["Title"] = "Chỉnh Sửa Người Dùng";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-area="Admin"
+      asp-controller="User"
+      asp-action="Edit"
+      method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PasswordHash" class="form-label">Mật khẩu</label>
+        <input asp-for="PasswordHash" type="password" class="form-control" />
+        <span asp-validation-for="PasswordHash" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label">Họ và tên</label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PhoneNumber" class="form-label">Số điện thoại</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="RegionId" class="form-label">Khu Vực</label>
+        <select asp-for="RegionId" class="form-select"
+                asp-items="@(new SelectList(ViewBag.Regions, "Id", "Name", Model.RegionId))">
+            <option value="">-- Chọn khu vực --</option>
+        </select>
+        <span asp-validation-for="RegionId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AddressDetail" class="form-label">Địa chỉ chi tiết</label>
+        <input asp-for="AddressDetail" class="form-control" />
+        <span asp-validation-for="AddressDetail" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsVerifiedResident" class="form-check-input" />
+        <label asp-for="IsVerifiedResident" class="form-check-label">Đã xác thực cư trú</label>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="RoleId" class="form-label">Vai Trò</label>
+        <select asp-for="RoleId" class="form-select"
+                asp-items="@(new SelectList(ViewBag.Roles, "Id", "RoleName", Model.RoleId))">
+            <option value="">-- Chọn vai trò --</option>
+        </select>
+        <span asp-validation-for="RoleId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
+</form>
