@@ -111,7 +111,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
                                             // Thêm thông báo mới ở đầu danh sách
                                             String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
                                                     .format(new java.util.Date());
-                                            String newLog = "🔒 Bạn đã đổi mật khẩu thành công lúc " + time;
+                                            String message = "🔒 Bạn đã đổi mật khẩu thành công ";
+                                            String newLog = "msg=" + message + "&&time=" + time;
 
                                             String updatedLogs = newLog + (existingLogs.isEmpty() ? "" : ";;" + existingLogs);
 

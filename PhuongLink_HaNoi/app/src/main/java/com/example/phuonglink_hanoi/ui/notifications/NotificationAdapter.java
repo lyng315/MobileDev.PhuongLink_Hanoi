@@ -25,10 +25,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         ImageView imgAvatar; // Avatar người dùng
         TextView tvNotification;
 
+        TextView tvTime; // Thời gian
+
         public ViewHolder(View itemView) {
             super(itemView);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
             tvNotification = itemView.findViewById(R.id.tvNotification);
+            tvTime = itemView.findViewById(R.id.tvTime);
         }
     }
 
@@ -42,11 +45,28 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull NotificationAdapter.ViewHolder holder, int position) {
-        String message = notificationList.get(position);
+        String fullLog = notificationList.get(position);
+        String message = "", time = "";
+
+        if (fullLog.contains("&&")) {
+            String[] parts = fullLog.split("&&");
+            for (String part : parts) {
+                if (part.startsWith("msg=")) {
+                    message = part.replace("msg=", "").trim();
+                } else if (part.startsWith("time=")) {
+                    time = part.replace("time=", "").trim();
+                }
+            }
+        } else {
+            // fallback nếu không có định dạng đặc biệt
+            message = fullLog;
+        }
 
         holder.tvNotification.setText(message);
-        holder.imgAvatar.setImageResource(R.drawable.ic_profile); // ảnh mặc định
+        holder.tvTime.setText(time);
+        holder.imgAvatar.setImageResource(R.drawable.ic_profile);
     }
+
 
     @Override
     public int getItemCount() {
