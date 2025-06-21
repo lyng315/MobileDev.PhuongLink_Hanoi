@@ -21,10 +21,12 @@ namespace WebApplication1.Models.Dtos
         [FirestoreProperty("createdAt")]
         public Timestamp CreatedAt { get; set; }
 
+        // Helper to convert to DateTime
         public DateTime CreatedAtDate => CreatedAt.ToDateTime();
 
-        // -- UI only, không map lên Firestore --
+        // UI-only properties (not stored in Firestore)
         public string PostTitle { get; set; } = "";
         public string AuthorEmail { get; set; } = "";
+        public string AuthorName { get; set; } = "";
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Google.Cloud.Firestore;
 
-
 namespace WebApplication1.Models.Dtos
 {
     [FirestoreData]
@@ -39,8 +38,8 @@ namespace WebApplication1.Models.Dtos
         [FirestoreProperty("createdAt")]
         public Timestamp CreatedAt { get; set; }
 
-        public string RoleName { get; set; } = "";  // Không cần FirestoreIgnore
+        // 2 trường chỉ để hiển thị ở UI, không map vào Firestore
+        public string RoleName { get; set; } = "";
         public string RegionName { get; set; } = "";
-
     }
 }

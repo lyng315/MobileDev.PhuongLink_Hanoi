@@ -1,7 +1,6 @@
 ﻿using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models.Dtos;
@@ -22,57 +21,76 @@ namespace WebApplication1.Areas.Admin.Controllers
         // GET: /Admin/User
         public async Task<IActionResult> Index()
         {
-            var userSnap = await _db.Collection("users").GetSnapshotAsync();
+            // 1) Lấy snapshot
+            var userSnap = await _db.Collection(COLL).GetSnapshotAsync();
             var regionSnap = await _db.Collection("regions").GetSnapshotAsync();
             var roleSnap = await _db.Collection("roles").GetSnapshotAsync();
 
-            // Đúng field "name" trong regions
-            var regionMap = regionSnap.Documents.ToDictionary(
-                d => d.Id,
-                d => d.GetValue<string>("name")
-            );
+            // 2) Chuẩn bị dropdown list roles (chỉ USER & LEADER)
+            var allRoles = roleSnap.Documents
+                                   .Where(d => d.Exists)
+                                   .Select(d => d.ConvertTo<RoleDto>())
+                                   .ToList();
+            var allowedNames = new[] { "RESIDENT", "LEADER" };
+            ViewBag.RolesList = allRoles
+                .Where(r => allowedNames.Contains(r.RoleName))
+                .ToList();
 
-            // Đúng field "roleName" trong roles
-            var roleMap = roleSnap.Documents.ToDictionary(
-                d => d.Id,
-                d => d.GetValue<string>("roleName")
-            );
+            // 3) Map regionId -> regionName
+            var regionMap = regionSnap.Documents
+                .Where(d => d.Exists)
+                .ToDictionary(d => d.Id,
+                              d => d.ConvertTo<RegionDto>().Name);
 
-            var list = userSnap.Documents.Select(d =>
-            {
-                var dto = d.ConvertTo<UserDto>();
-                dto.Id = d.Id;
+            // 4) Map roleId -> roleName
+            var roleMap = allRoles
+                .ToDictionary(r => r.Id, r => r.RoleName);
 
-                // Gán tên khu vực nếu tồn tại
-                if (!string.IsNullOrEmpty(dto.RegionId) && regionMap.TryGetValue(dto.RegionId, out var regionName))
+            // 5) Build list UserDto kèm RegionName & RoleName
+            var list = userSnap.Documents
+                .Select(d =>
                 {
-                    dto.RegionName = regionName;
-                }
-
-                // Gán tên vai trò nếu tồn tại
-                if (!string.IsNullOrEmpty(dto.RoleId) && roleMap.TryGetValue(dto.RoleId, out var roleName))
-                {
-                    dto.RoleName = roleName;
-                }
-
-                return dto;
-            }).ToList();
+                    var dto = d.ConvertTo<UserDto>();
+                    dto.Id = d.Id;
+                    if (!string.IsNullOrEmpty(dto.RegionId) && regionMap.TryGetValue(dto.RegionId, out var rn))
+                        dto.RegionName = rn;
+                    if (!string.IsNullOrEmpty(dto.RoleId) && roleMap.TryGetValue(dto.RoleId, out var ro))
+                        dto.RoleName = ro;
+                    return dto;
+                })
+                // 6) Lọc bỏ ADMIN
+                .Where(u => u.RoleName != "ADMIN")
+                .ToList();
 
             return View(list);
         }
 
+        // POST: /Admin/User/ChangeRole
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeRole(string id, string roleId)
+        {
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(roleId))
+                return BadRequest();
 
+            await _db.Collection(COLL)
+                     .Document(id)
+                     .UpdateAsync(new Dictionary<string, object>
+                     {
+                         ["roleId"] = roleId
+                     });
+
+            return RedirectToAction(nameof(Index));
+        }
 
         // GET: /Admin/User/Create
         public async Task<IActionResult> Create()
         {
             ViewBag.Regions = (await _db.Collection("regions").GetSnapshotAsync())
-                              .Documents.Select(d => d.ConvertTo<RegionDto>())
-                              .ToList();
+                .Documents.Select(d => d.ConvertTo<RegionDto>())
+                .ToList();
             ViewBag.Roles = (await _db.Collection("roles").GetSnapshotAsync())
-                              .Documents.Select(d => d.ConvertTo<RoleDto>())
-                              .ToList();
-
+                .Documents.Select(d => d.ConvertTo<RoleDto>())
+                .ToList();
             return View(new UserDto());
         }
 
@@ -80,35 +98,26 @@ namespace WebApplication1.Areas.Admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserDto dto)
         {
-            // Nếu validation lỗi, phải re-populate ViewBag trước khi trả View
             if (!ModelState.IsValid)
             {
                 ViewBag.Regions = (await _db.Collection("regions").GetSnapshotAsync())
-                                  .Documents.Select(d => d.ConvertTo<RegionDto>())
-                                  .ToList();
+                    .Documents.Select(d => d.ConvertTo<RegionDto>())
+                    .ToList();
                 ViewBag.Roles = (await _db.Collection("roles").GetSnapshotAsync())
-                                  .Documents.Select(d => d.ConvertTo<RoleDto>())
-                                  .ToList();
+                    .Documents.Select(d => d.ConvertTo<RoleDto>())
+                    .ToList();
                 return View(dto);
             }
 
-            // 1) Lấy các userId hiện có
             var snap = await _db.Collection(COLL).GetSnapshotAsync();
             var maxNum = snap.Documents
                               .Select(d => d.Id)
                               .Where(id => id.StartsWith("user"))
-                              .Select(id =>
-                              {
-                                  var tail = id.Substring("user".Length);
-                                  return int.TryParse(tail, out var n) ? n : 0;
-                              })
+                              .Select(id => int.TryParse(id.Substring(4), out var n) ? n : 0)
                               .DefaultIfEmpty(0)
                               .Max();
-
-            // 2) Tính ID mới
             var newId = $"user{maxNum + 1:00}";
 
-            // 3) Tạo document với ID mới
             await _db.Collection(COLL)
                      .Document(newId)
                      .SetAsync(dto);
@@ -128,11 +137,11 @@ namespace WebApplication1.Areas.Admin.Controllers
             dto.Id = snap.Id;
 
             ViewBag.Regions = (await _db.Collection("regions").GetSnapshotAsync())
-                              .Documents.Select(d => d.ConvertTo<RegionDto>())
-                              .ToList();
+                .Documents.Select(d => d.ConvertTo<RegionDto>())
+                .ToList();
             ViewBag.Roles = (await _db.Collection("roles").GetSnapshotAsync())
-                              .Documents.Select(d => d.ConvertTo<RoleDto>())
-                              .ToList();
+                .Documents.Select(d => d.ConvertTo<RoleDto>())
+                .ToList();
 
             return View(dto);
         }
@@ -144,11 +153,11 @@ namespace WebApplication1.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Regions = (await _db.Collection("regions").GetSnapshotAsync())
-                                  .Documents.Select(d => d.ConvertTo<RegionDto>())
-                                  .ToList();
+                    .Documents.Select(d => d.ConvertTo<RegionDto>())
+                    .ToList();
                 ViewBag.Roles = (await _db.Collection("roles").GetSnapshotAsync())
-                                  .Documents.Select(d => d.ConvertTo<RoleDto>())
-                                  .ToList();
+                    .Documents.Select(d => d.ConvertTo<RoleDto>())
+                    .ToList();
                 return View(dto);
             }
 

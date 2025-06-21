@@ -1,10 +1,10 @@
 ﻿using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models.Dtos;
+using WebApplication1.Models.ViewModels;
 
 namespace WebApplication1.Areas.Admin.Controllers
 {
@@ -27,101 +27,72 @@ namespace WebApplication1.Areas.Admin.Controllers
             var categoriesSnap = await _db.Collection("postCategories").GetSnapshotAsync();
             var regionsSnap = await _db.Collection("regions").GetSnapshotAsync();
 
+            // Build lookup maps
             var userMap = usersSnap.Documents.ToDictionary(d => d.Id, d => d.GetValue<string>("fullName"));
             var categoryMap = categoriesSnap.Documents.ToDictionary(d => d.Id, d => d.GetValue<string>("name"));
             var regionMap = regionsSnap.Documents.ToDictionary(d => d.Id, d => d.GetValue<string>("name"));
 
-            var list = postsSnap.Documents.Select(d =>
-            {
-                var dto = d.ConvertTo<PostsDTO>();
-                dto.Id = d.Id;
-
-                dto.AuthorName = userMap.GetValueOrDefault(dto.AuthorUserId ?? "");
-                dto.CategoryName = categoryMap.GetValueOrDefault(dto.CategoryId ?? "");
-                dto.RegionName = regionMap.GetValueOrDefault(dto.TargetRegionId ?? "");
-
-                return dto;
-            }).ToList();
+            var list = postsSnap.Documents
+                .Select(d =>
+                {
+                    var dto = d.ConvertTo<PostsDTO>();
+                    dto.Id = d.Id;
+                    dto.AuthorName = userMap.GetValueOrDefault(dto.AuthorUserId ?? "");
+                    dto.CategoryName = categoryMap.GetValueOrDefault(dto.CategoryId ?? "");
+                    dto.RegionName = regionMap.GetValueOrDefault(dto.TargetRegionId ?? "");
+                    return dto;
+                })
+                .ToList();
 
             return View(list);
         }
 
-        // GET: /Admin/Posts/Create
-        public async Task<IActionResult> Create()
-        {
-            ViewBag.Users = await _db.Collection("users").GetSnapshotAsync();
-            ViewBag.Categories = await _db.Collection("postCategories").GetSnapshotAsync();
-            ViewBag.Regions = await _db.Collection("regions").GetSnapshotAsync();
-            return View(new PostsDTO());
-        }
-
-        // POST: /Admin/Posts/Create
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PostsDTO dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                await LoadSelectLists();
-                return View(dto);
-            }
-
-            var snap = await _db.Collection(COLL).GetSnapshotAsync();
-            var max = snap.Documents
-                          .Select(d => d.Id)
-                          .Where(id => id.StartsWith("post"))
-                          .Select(id => int.TryParse(id.Substring("post".Length), out var n) ? n : 0)
-                          .DefaultIfEmpty(0)
-                          .Max();
-
-            var newId = $"post{max + 1:00}";
-
-            dto.CreatedAt = Timestamp.FromDateTime(DateTime.UtcNow);
-            dto.EditedAt = dto.CreatedAt;
-
-            await _db.Collection(COLL).Document(newId).SetAsync(dto);
-            return RedirectToAction(nameof(Index));
-        }
-
-        // GET: /Admin/Posts/Edit/{id}
-        public async Task<IActionResult> Edit(string id)
+        // GET: /Admin/Posts/Details/{id}
+        public async Task<IActionResult> Details(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
-            var snap = await _db.Collection(COLL).Document(id).GetSnapshotAsync();
-            if (!snap.Exists) return NotFound();
+            // 1) Load post document
+            var postSnap = await _db.Collection(COLL).Document(id).GetSnapshotAsync();
+            if (!postSnap.Exists) return NotFound();
 
-            var dto = snap.ConvertTo<PostsDTO>();
-            dto.Id = snap.Id;
+            var postDto = postSnap.ConvertTo<PostsDTO>();
+            postDto.Id = postSnap.Id;
 
-            await LoadSelectLists();
-            return View(dto);
-        }
+            // Lookup author, category, region
+            var userSnap = await _db.Collection("users").Document(postDto.AuthorUserId ?? "").GetSnapshotAsync();
+            postDto.AuthorName = userSnap.Exists ? userSnap.GetValue<string>("fullName") : "";
+            var catSnap = await _db.Collection("postCategories").Document(postDto.CategoryId ?? "").GetSnapshotAsync();
+            postDto.CategoryName = catSnap.Exists ? catSnap.GetValue<string>("name") : "";
+            var regSnap = await _db.Collection("regions").Document(postDto.TargetRegionId ?? "").GetSnapshotAsync();
+            postDto.RegionName = regSnap.Exists ? regSnap.GetValue<string>("name") : "";
 
-        // POST: /Admin/Posts/Edit
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PostsDTO dto)
-        {
-            if (!ModelState.IsValid)
+            // 2) Load comments (filter only) and sort in-memory
+            var commentSnap = await _db.Collection("comments")
+                                       .WhereEqualTo("postId", id)
+                                       .GetSnapshotAsync();
+
+            var comments = commentSnap.Documents
+                .Select(c =>
+                {
+                    var dto = c.ConvertTo<CommentDto>();
+                    dto.Id = c.Id;
+                    // Lookup commenter name
+                    var commenter = _db.Collection("users").Document(dto.AuthorUserId ?? "").GetSnapshotAsync().Result;
+                    dto.AuthorName = commenter.Exists ? commenter.GetValue<string>("fullName") : "";
+                    return dto;
+                })
+                .OrderBy(c => c.CreatedAt.ToDateTime())
+                .ToList();
+
+            // 3) Build ViewModel
+            var vm = new PostDetailsViewModel
             {
-                await LoadSelectLists();
-                return View(dto);
-            }
-
-            dto.EditedAt = Timestamp.FromDateTime(DateTime.UtcNow);
-
-            var updateDict = new Dictionary<string, object>
-            {
-                ["title"] = dto.Title,
-                ["content"] = dto.Content,
-                ["authorUserId"] = dto.AuthorUserId,
-                ["categoryId"] = dto.CategoryId,
-                ["targetRegionId"] = dto.TargetRegionId,
-                ["urgencyLevel"] = dto.UrgencyLevel,
-                ["editedAt"] = dto.EditedAt
+                Post = postDto,
+                Comments = comments
             };
 
-            await _db.Collection(COLL).Document(dto.Id).UpdateAsync(updateDict);
-            return RedirectToAction(nameof(Index));
+            return View(vm);
         }
 
         // POST: /Admin/Posts/Delete/{id}
@@ -129,15 +100,9 @@ namespace WebApplication1.Areas.Admin.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrEmpty(id)) return BadRequest();
+
             await _db.Collection(COLL).Document(id).DeleteAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private async Task LoadSelectLists()
-        {
-            ViewBag.Users = await _db.Collection("users").GetSnapshotAsync();
-            ViewBag.Categories = await _db.Collection("postCategories").GetSnapshotAsync();
-            ViewBag.Regions = await _db.Collection("regions").GetSnapshotAsync();
         }
     }
 }
