@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="severity_levels">
+        <item>Khẩn cấp</item>
+        <item>Quan trọng</item>
+        <item>Bình thường</item>
+    </string-array>
+</resources>

@@ -33,10 +33,13 @@ namespace WebApplication1.Areas.Admin.Controllers
             );
 
             // Đúng field "roleName" trong roles
-            var roleMap = roleSnap.Documents.ToDictionary(
-                d => d.Id,
-                d => d.GetValue<string>("roleName")
-            );
+            var roleMap = roleSnap.Documents
+     .Where(d => d.ContainsField("roleName"))
+     .ToDictionary(
+         d => d.Id,
+         d => d.GetValue<string>("roleName")
+     );
+
 
             var list = userSnap.Documents.Select(d =>
             {

@@ -24,6 +24,14 @@
     <string name="post_image">Ảnh bài viết</string>
     <string name="action_like">Thích</string>
     <string name="action_comment">Bình luận</string>
+    <string name="action_signup">Đăng ký</string>
+    <string name="action_login">Đăng nhập</string>
+    <string name="desc_user_avatar">Ảnh đại diện người dùng</string>
+    <string name="desc_verified"></string>
+    <string name="label_attach_file">Đính kèm file</string>
+    <string name="label_attach_image">Đính kèm ảnh</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
 
 
 </resources>

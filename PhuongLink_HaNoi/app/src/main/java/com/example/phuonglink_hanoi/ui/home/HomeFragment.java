@@ -60,7 +60,8 @@ public class HomeFragment extends Fragment {
 
         // Setup RecyclerView
         binding.rvPosts.setLayoutManager(new LinearLayoutManager(requireContext()));
-        postAdapter = new PostAdapter(requireContext(), new ArrayList<>());
+        // ← isGuest = false để user đã login không thấy dialog
+        postAdapter = new PostAdapter(requireContext(), new ArrayList<>(), false);
         binding.rvPosts.setAdapter(postAdapter);
 
         // Item click opens details
@@ -70,15 +71,16 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        // Observe posts and load initial data
+        // Observe posts và load initial data
         viewModel.getPosts().observe(getViewLifecycleOwner(), postAdapter::updateList);
         viewModel.loadPostsByUserRegion();
 
-        // Search with debounce
+        // Search với debounce
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (searchRunnable != null) handler.removeCallbacks(searchRunnable);
                 searchRunnable = () -> {
                     String keyword = s.toString().trim();
@@ -92,7 +94,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // Filter button
+        // Nút Filter
         binding.btnFilter.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), FilterActivity.class);
             filterLauncher.launch(intent);

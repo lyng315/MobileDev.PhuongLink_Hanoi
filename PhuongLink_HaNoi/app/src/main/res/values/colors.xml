@@ -18,7 +18,8 @@
     <color name="light_gray">#F5F5F5</color>
     <color name="gray_border">#DDDDDD</color>
     <color name="colorOnPrimary">#FFFFFFFF</color>
-
+    <color name="colorPrimary">#054DB3</color>
+    <color name="colorSecondaryText">#888888</color>
 
 
 

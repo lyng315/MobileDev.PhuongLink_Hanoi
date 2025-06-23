@@ -1,7 +1,6 @@
 package com.example.phuonglink_hanoi;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText edtUsername;
     private TextInputEditText edtPassword;
     private MaterialButton btnLogin;
+    private MaterialButton btnGuestMode;       // ← thêm dòng này
     private TextView tvForgot;
     private TextView tvSignupLink;
 
@@ -42,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         edtUsername  = findViewById(R.id.edtUsername);
         edtPassword  = findViewById(R.id.edtPassword);
         btnLogin     = findViewById(R.id.btnLogin);
+        btnGuestMode = findViewById(R.id.btnGuestMode);    // ← ánh xạ nút Chế độ khách
         tvForgot     = findViewById(R.id.tvForgot);
         tvSignupLink = findViewById(R.id.tvSignupLink);
 
@@ -55,6 +56,11 @@ public class LoginActivity extends AppCompatActivity {
         // Chuyển sang màn Đăng ký
         tvSignupLink.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        });
+
+        // Chuyển sang chế độ khách
+        btnGuestMode.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, GuestActivity.class));
         });
 
         // Xử lý đăng nhập
@@ -71,15 +77,6 @@ public class LoginActivity extends AppCompatActivity {
                     .addOnSuccessListener(authResult -> {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null && user.isEmailVerified()) {
-                            // Ghi userId + avatar vào SharedPreferences
-                            String userId = user.getUid();  // hoặc user.getEmail() nếu bạn muốn dùng email làm ID
-                            String avatarUrl = user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
-
-                            SharedPreferences prefs = getSharedPreferences("userPrefs", MODE_PRIVATE);
-                            prefs.edit()
-                                    .putString("userId", userId)
-                                    .putString("avatarUrl", avatarUrl) // có thể là null
-                                    .apply();
                             // Email đã xác thực → vào Main
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();

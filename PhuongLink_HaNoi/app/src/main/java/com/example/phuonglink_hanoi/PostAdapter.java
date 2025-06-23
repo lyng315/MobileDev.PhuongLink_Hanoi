@@ -1,6 +1,8 @@
 package com.example.phuonglink_hanoi;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
+    /** Interface để lắng nghe click vào toàn bộ item */
     public interface OnItemClickListener {
         void onItemClick(Post post);
     }
@@ -25,15 +28,22 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private final Context context;
     private List<Post> postList;
     private OnItemClickListener listener;
+    private final boolean isGuest;     // ← thêm flag
 
-    public PostAdapter(Context context, List<Post> postList) {
-        this.context = context;
+    /**
+     * @param context   context từ Activity
+     * @param postList  danh sách Post
+     * @param isGuest   true nếu adapter này dùng cho màn Guest
+     */
+    public PostAdapter(Context context, List<Post> postList, boolean isGuest) {
+        this.context  = context;
         this.postList = postList;
+        this.isGuest  = isGuest;
     }
 
-    /** Gán callback để HomeFragment bắt sự kiện click */
-    public void setOnItemClickListener(OnItemClickListener l) {
-        this.listener = l;
+    /** Gán callback để Activity/Fragment bắt sự kiện click item */
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     /** Cập nhật data và refresh */
@@ -88,25 +98,58 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.tvTime.setText("");
         }
 
-        // 4. Ảnh thumb
+        // 4. Ảnh thumbnail
         Glide.with(context)
                 .load(post.getThumbnailUrl())
                 .placeholder(R.drawable.loading)
                 .into(holder.ivThumbnail);
 
-        // 5. Bắt sự kiện click chuyển sang chi tiết
+        // 5. Click vào item chính
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onItemClick(post);
+            if (listener != null) {
+                listener.onItemClick(post);
+            }
+        });
+
+        // 6. Click vào Favorite
+        holder.ivFavorite.setOnClickListener(v -> {
+            if (isGuest) {
+                showLoginDialog();
+            } else {
+                // TODO: thêm logic favorite cho user đã login
+            }
+        });
+
+        // 7. Click vào Comment
+        holder.ivComment.setOnClickListener(v -> {
+            if (isGuest) {
+                showLoginDialog();
+            } else {
+                // TODO: mở màn comment cho user đã login
+            }
         });
     }
 
-    @Override public int getItemCount() {
+    @Override
+    public int getItemCount() {
         return postList == null ? 0 : postList.size();
+    }
+
+    /** Hiện dialog yêu cầu đăng nhập */
+    private void showLoginDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Yêu cầu đăng nhập")
+                .setMessage("Bạn cần đăng nhập để thực hiện thao tác này.")
+                .setPositiveButton("Đăng nhập", (dialog, which) -> {
+                    context.startActivity(new Intent(context, LoginActivity.class));
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     /** ViewHolder chứa các view của item_post_preview.xml */
     static class PostViewHolder extends RecyclerView.ViewHolder {
-        TextView tvSeverity, tvTitle, tvTime;
+        TextView  tvSeverity, tvTitle, tvTime;
         ImageView ivThumbnail, ivFavorite, ivComment;
 
         public PostViewHolder(@NonNull View itemView) {

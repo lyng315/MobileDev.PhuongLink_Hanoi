@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.phuonglink_hanoi.EditProfileActivity;
 import com.example.phuonglink_hanoi.LoginActivity;
 import com.example.phuonglink_hanoi.R;
 import com.example.phuonglink_hanoi.databinding.FragmentProfileBinding;
@@ -100,6 +101,10 @@ public class ProfileFragment extends Fragment {
                 startActivity(new Intent(requireContext(), ChangePasswordActivity.class))
         );
 
+        //Chinh sua trang ca nhan
+        binding.itemEditProfile.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), EditProfileActivity.class)));
+
         // Đăng xuất
         binding.itemLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -113,7 +118,6 @@ public class ProfileFragment extends Fragment {
         final String fullName = snap.getString("fullName");
         final String email = snap.getString("email");
         final String phoneNumber = snap.getString("phoneNumber");
-        final String addressDetail = snap.getString("addressDetail");
         final String regionId = snap.getString("regionId");
         final String avatarUrl = snap.getString("avatarUrl");
 
@@ -126,30 +130,22 @@ public class ProfileFragment extends Fragment {
                 .placeholder(R.drawable.ic_profile)
                 .into(binding.imgAvatar);
 
-        // Load tên vùng và ghép địa chỉ chi tiết
+        // Chỉ tải và hiển thị tên vùng, bỏ qua addressDetail
         if (regionId != null && !regionId.isEmpty()) {
             db.collection("regions")
                     .document(regionId)
                     .get()
                     .addOnSuccessListener(doc -> {
                         final String regionName = doc.getString("name");
-                        String addr = "";
-                        if (regionName != null) addr += regionName;
-                        if (addressDetail != null && !addressDetail.isEmpty()) {
-                            if (!addr.isEmpty()) addr += ", ";
-                            addr += addressDetail;
-                        }
-                        binding.tvAddress.setText(addr);
+                        binding.tvAddress.setText(regionName != null ? regionName : "");
                     })
                     .addOnFailureListener(e ->
-                            binding.tvAddress.setText(
-                                    addressDetail != null ? addressDetail : ""
-                            )
+                            // Nếu không tải được tên vùng, hiển thị chuỗi rỗng
+                            binding.tvAddress.setText("")
                     );
         } else {
-            binding.tvAddress.setText(
-                    addressDetail != null ? addressDetail : ""
-            );
+            // Nếu không có regionId, hiển thị chuỗi rỗng
+            binding.tvAddress.setText("");
         }
     }
 
@@ -170,13 +166,16 @@ public class ProfileFragment extends Fragment {
                     return ref.getDownloadUrl();
                 })
                 .addOnSuccessListener(downloadUri -> {
+                    // Cập nhật avatarUrl trong Firestore
                     db.collection("users")
                             .document(uid)
                             .update("avatarUrl", downloadUri.toString());
+                    // Hiển thị ảnh đại diện mới ngay lập tức
                     Glide.with(this)
                             .load(downloadUri)
                             .placeholder(R.drawable.ic_profile)
                             .into(binding.imgAvatar);
+                    Toast.makeText(getContext(), "Tải ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(),
