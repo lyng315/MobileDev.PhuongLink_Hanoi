@@ -82,7 +82,7 @@
                 android:visibility="gone"
                 android:text="" />
 
-            <!-- Thêm ngay trước tilUsername -->
+            <!-- Username label -->
             <TextView
                 android:id="@+id/tvLabelUsername"
                 android:layout_width="match_parent"
@@ -92,8 +92,7 @@
                 android:textColor="#333"
                 android:textSize="25sp" />
 
-
-            <!-- Username -->
+            <!-- Username input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilUsername"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -119,6 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="16dp"/>
 
+            <!-- Password label -->
             <TextView
                 android:id="@+id/tvLabelPassword"
                 android:layout_width="match_parent"
@@ -128,7 +128,7 @@
                 android:textColor="#333"
                 android:textSize="25sp" />
 
-            <!-- Password -->
+            <!-- Password input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPassword"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -171,10 +171,21 @@
                 android:text="@string/btn_login"
                 android:textColor="@android:color/white"
                 app:cornerRadius="8dp" />
+
+            <!-- Guest Mode button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGuestMode"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#E0E0E0"
+                android:text="Chế độ khách"
+                android:textColor="#888888"
+                app:cornerRadius="8dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- 4. Signup prompt: tạo chain packed gồm 2 TextView -->
+    <!-- 4. Signup prompt -->
     <TextView
         android:id="@+id/tvSignupPrompt"
         android:layout_width="wrap_content"
@@ -196,9 +207,8 @@
         android:textColor="#0057B8"
         android:textSize="14sp"
         android:textStyle="bold"
+        android:layout_marginStart="4dp"
         app:layout_constraintBaseline_toBaselineOf="@id/tvSignupPrompt"
         app:layout_constraintStart_toEndOf="@id/tvSignupPrompt"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

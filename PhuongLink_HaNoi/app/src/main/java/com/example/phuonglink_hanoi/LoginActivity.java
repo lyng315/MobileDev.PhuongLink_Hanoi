@@ -23,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText edtUsername;
     private TextInputEditText edtPassword;
     private MaterialButton btnLogin;
+    private MaterialButton btnGuestMode;       // ← thêm dòng này
     private TextView tvForgot;
     private TextView tvSignupLink;
 
@@ -41,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         edtUsername  = findViewById(R.id.edtUsername);
         edtPassword  = findViewById(R.id.edtPassword);
         btnLogin     = findViewById(R.id.btnLogin);
+        btnGuestMode = findViewById(R.id.btnGuestMode);    // ← ánh xạ nút Chế độ khách
         tvForgot     = findViewById(R.id.tvForgot);
         tvSignupLink = findViewById(R.id.tvSignupLink);
 
@@ -54,6 +56,11 @@ public class LoginActivity extends AppCompatActivity {
         // Chuyển sang màn Đăng ký
         tvSignupLink.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        });
+
+        // Chuyển sang chế độ khách
+        btnGuestMode.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, GuestActivity.class));
         });
 
         // Xử lý đăng nhập

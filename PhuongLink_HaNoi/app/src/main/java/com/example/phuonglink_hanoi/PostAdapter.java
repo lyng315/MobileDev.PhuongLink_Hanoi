@@ -1,6 +1,8 @@
 package com.example.phuonglink_hanoi;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,79 +20,136 @@ import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
-    private final Context context;
-    private List<Post> postList;
-
-    public PostAdapter(Context context, List<Post> postList) {
-        this.context = context;
-        this.postList = postList;
+    /** Interface để lắng nghe click vào toàn bộ item */
+    public interface OnItemClickListener {
+        void onItemClick(Post post);
     }
 
-    @NonNull
-    @Override
+    private final Context context;
+    private List<Post> postList;
+    private OnItemClickListener listener;
+    private final boolean isGuest;     // ← thêm flag
+
+    /**
+     * @param context   context từ Activity
+     * @param postList  danh sách Post
+     * @param isGuest   true nếu adapter này dùng cho màn Guest
+     */
+    public PostAdapter(Context context, List<Post> postList, boolean isGuest) {
+        this.context  = context;
+        this.postList = postList;
+        this.isGuest  = isGuest;
+    }
+
+    /** Gán callback để Activity/Fragment bắt sự kiện click item */
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+    /** Cập nhật data và refresh */
+    public void updateList(List<Post> newList) {
+        this.postList = newList;
+        notifyDataSetChanged();
+    }
+
+    @NonNull @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_post_preview, parent, false);
-        return new PostViewHolder(view);
+        View v = LayoutInflater.from(context)
+                .inflate(R.layout.item_post_preview, parent, false);
+        return new PostViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         Post post = postList.get(position);
 
-        // Urgency level
+        // 1. Mức độ khẩn cấp
         switch (post.getUrgencyLevel()) {
             case 3:
                 holder.tvSeverity.setText("Khẩn cấp");
-                holder.tvSeverity.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
+                holder.tvSeverity.setTextColor(
+                        ContextCompat.getColor(context, android.R.color.holo_red_dark));
                 break;
             case 2:
                 holder.tvSeverity.setText("Quan trọng");
-                holder.tvSeverity.setTextColor(ContextCompat.getColor(context, R.color.colorSeverityImportant));
+                holder.tvSeverity.setTextColor(
+                        ContextCompat.getColor(context, R.color.colorSeverityImportant));
                 break;
             default:
                 holder.tvSeverity.setText("Bình thường");
-                holder.tvSeverity.setTextColor(ContextCompat.getColor(context, R.color.colorSeverityNormal));
+                holder.tvSeverity.setTextColor(
+                        ContextCompat.getColor(context, R.color.colorSeverityNormal));
                 break;
         }
 
+        // 2. Tiêu đề
         holder.tvTitle.setText(post.getTitle());
 
-        // Time ago
+        // 3. Hiển thị “time ago”
         if (post.getCreatedAt() != null) {
             long millis = post.getCreatedAt().toDate().getTime();
-            String timeAgo = DateUtils.getRelativeTimeSpanString(
-                    millis, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString();
-            holder.tvTime.setText(timeAgo);
+            String ago = DateUtils.getRelativeTimeSpanString(
+                    millis,
+                    System.currentTimeMillis(),
+                    DateUtils.MINUTE_IN_MILLIS
+            ).toString();
+            holder.tvTime.setText(ago);
+        } else {
+            holder.tvTime.setText("");
         }
 
-        // Thumbnail
+        // 4. Ảnh thumbnail
         Glide.with(context)
                 .load(post.getThumbnailUrl())
                 .placeholder(R.drawable.loading)
                 .into(holder.ivThumbnail);
 
-        // Favorite and comment icons
-        holder.ivFavorite.setOnClickListener(v ->
-                holder.ivFavorite.setImageResource(R.drawable.ic_favorite_base)
-        );
+        // 5. Click vào item chính
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(post);
+            }
+        });
 
+        // 6. Click vào Favorite
+        holder.ivFavorite.setOnClickListener(v -> {
+            if (isGuest) {
+                showLoginDialog();
+            } else {
+                // TODO: thêm logic favorite cho user đã login
+            }
+        });
+
+        // 7. Click vào Comment
         holder.ivComment.setOnClickListener(v -> {
-            // TODO: mở màn hình comment nếu cần
+            if (isGuest) {
+                showLoginDialog();
+            } else {
+                // TODO: mở màn comment cho user đã login
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return (postList != null) ? postList.size() : 0;
+        return postList == null ? 0 : postList.size();
     }
 
-    public void updateList(List<Post> newList) {
-        this.postList = newList;
-        notifyDataSetChanged();
+    /** Hiện dialog yêu cầu đăng nhập */
+    private void showLoginDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Yêu cầu đăng nhập")
+                .setMessage("Bạn cần đăng nhập để thực hiện thao tác này.")
+                .setPositiveButton("Đăng nhập", (dialog, which) -> {
+                    context.startActivity(new Intent(context, LoginActivity.class));
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
+    /** ViewHolder chứa các view của item_post_preview.xml */
     static class PostViewHolder extends RecyclerView.ViewHolder {
-        TextView tvSeverity, tvTitle, tvTime;
+        TextView  tvSeverity, tvTitle, tvTime;
         ImageView ivThumbnail, ivFavorite, ivComment;
 
         public PostViewHolder(@NonNull View itemView) {

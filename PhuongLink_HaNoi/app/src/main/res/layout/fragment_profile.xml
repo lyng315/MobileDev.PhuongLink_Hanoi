@@ -24,6 +24,7 @@
             android:layout_height="150dp"
             android:padding="8dp"
             android:scaleType="centerCrop"
+
             android:src="@drawable/ic_profile"
             android:clickable="true"
             android:foreground="?attr/selectableItemBackground"
@@ -100,30 +101,6 @@
             </LinearLayout>
 
             <!-- CCCD -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="CCCD:"
-                    android:textColor="#333"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvCccd"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text="001304036231"
-                    android:textColor="#555"
-                    android:textSize="16sp" />
-            </LinearLayout>
 
             <!-- SĐT -->
             <LinearLayout

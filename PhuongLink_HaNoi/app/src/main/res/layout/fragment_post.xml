@@ -113,7 +113,7 @@
 
             android:paddingBottom="16dp"
             android:scrollbars="vertical"
-            tools:listitem="@layout/item_post_preview"
+            tools:listitem="@layout/item_post_action"
             tools:ignore="SpeakableTextPresent"/>
     </FrameLayout>
 

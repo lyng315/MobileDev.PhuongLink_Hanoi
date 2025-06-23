@@ -7,7 +7,20 @@
     <color name="teal_700">#6BAFEB</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primaryBlue">#054DB3</color>
+    <color name="gray">#888888</color>
+
     <color name="colorSeverityImportant">#FFA000</color> <!-- ví dụ màu cam -->
     <color name="colorSeverityNormal">#4CAF50</color>    <!-- ví dụ màu xanh lá -->
+
+    <!--Màu sử dụng trong filter-->
+    <color name="black1">#222222</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="gray_border">#DDDDDD</color>
+    <color name="colorOnPrimary">#FFFFFFFF</color>
+    <color name="colorPrimary">#054DB3</color>
+    <color name="colorSecondaryText">#888888</color>
+
+
 
 </resources>
