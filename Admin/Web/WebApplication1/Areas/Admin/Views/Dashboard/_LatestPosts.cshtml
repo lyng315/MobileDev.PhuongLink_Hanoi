@@ -1,0 +1,20 @@
+﻿@* _LatestPosts.cshtml *@
+@model List<WebApplication1.Models.Dtos.PostsDTO>
+
+@foreach (var post in Model)
+{
+    @* Đảm bảo class và data-timestamp giống như trong Main View *@
+    <div class="col-md-4 post-item" data-timestamp="@(post.CreatedAt.ToDateTime().ToString("o"))">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(post.ThumbnailUrl))
+                {
+                    <img src="@post.ThumbnailUrl" class="img-fluid mb-3" alt="Thumbnail" />
+                }
+                <h5 class="card-title">@post.Title</h5>
+                <p class="card-text">@post.Content.Substring(0, Math.Min(post.Content.Length, 100))...</p>
+                <a href="@Url.Action("Details", "Posts", new { id = post.Id })" class="btn btn-primary">Xem chi tiết</a>
+            </div>
+        </div>
+    </div>
+}

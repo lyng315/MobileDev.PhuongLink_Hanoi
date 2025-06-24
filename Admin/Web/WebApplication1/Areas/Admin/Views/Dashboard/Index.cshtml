@@ -1,0 +1,174 @@
+﻿@model WebApplication1.Models.ViewModels.CommunityDashboardViewModel
+@{
+    ViewData["Title"] = "Bảng tin Cộng đồng";
+    // var stt = 0; // Biến này không được sử dụng, có thể xóa
+    var searchQuery = ViewData["SearchQuery"]?.ToString();
+    // var skip = Model.LatestPosts.Count; // Không cần thiết ở đây nữa, logic sẽ dùng timestamp
+}
+
+<div class="container my-4">
+    <h2 class="fw-bold">Bảng tin cộng đồng</h2>
+    <p class="text-muted">Cập nhật thông tin mới nhất trong khu vực</p>
+
+    <div class="row g-4 my-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="mb-2 fs-3 text-primary"><i class="bi bi-journal-text"></i></div>
+                    <div class="fs-5 fw-bold">@Model.TotalPosts</div>
+                    <div class="text-muted">Bài viết mới</div>
+                    <div class="mt-1 text-@(Model.GrowthPostPercent >= 0 ? "success" : "danger")">
+                        <small>@(Model.GrowthPostPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.GrowthPostPercent)% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="mb-2 fs-3 text-warning"><i class="bi bi-chat-dots"></i></div>
+                    <div class="fs-5 fw-bold">@Model.TotalComments</div>
+                    <div class="text-muted">Bình luận mới</div>
+                    <div class="mt-1 text-@(Model.GrowthCommentPercent >= 0 ? "success" : "danger")">
+                        <small>@(Model.GrowthCommentPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.GrowthCommentPercent)% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="mb-2 fs-3 text-success"><i class="bi bi-people"></i></div>
+                    <div class="fs-5 fw-bold">@Model.TotalUsers</div>
+                    <div class="text-muted">Thành viên mới</div>
+                    <div class="mt-1 text-@(Model.GrowthUserPercent >= 0 ? "success" : "danger")">
+                        <small>@(Model.GrowthUserPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.GrowthUserPercent)% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="latest-posts" class="row g-4 my-3">
+        @foreach (var post in Model.LatestPosts)
+        {
+            <div class="col-md-4 post-item" data-timestamp="@(post.CreatedAt.ToDateTime().ToString("o"))">
+                @* Thêm class và data-timestamp *@
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(post.ThumbnailUrl))
+                        {
+                            <img src="@post.ThumbnailUrl" class="img-fluid mb-3" alt="Thumbnail" />
+                        }
+                        <h5 class="card-title">@post.Title</h5>
+                        <p class="card-text">@post.Content.Substring(0, Math.Min(post.Content.Length, 100))...</p>
+                        <a href="@Url.Action("Details", "Posts", new { id = post.Id })" class="btn btn-primary">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12 text-center">
+            @* Thêm data-last-post-timestamp vào nút ban đầu *@
+            @if (Model.LatestPosts != null && Model.LatestPosts.Any())
+            {
+                <button id="loadMoreButton" class="btn btn-outline-primary"
+                        data-last-post-timestamp="@(Model.LatestPosts.Last().CreatedAt.ToDateTime().ToString("o"))"
+                        onclick="loadMorePosts()">
+                    Xem thêm bài viết
+                </button>
+            }
+            else
+            {
+                <button id="loadMoreButton" class="btn btn-outline-primary" style="display: none;">
+                    Xem thêm bài viết
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Không cần biến skip nữa, sử dụng timestamp
+        function loadMorePosts() {
+            const loadMoreButton = document.getElementById("loadMoreButton");
+            const lastTimestamp = loadMoreButton.getAttribute("data-last-post-timestamp");
+            const postListContainer = document.getElementById("latest-posts"); // Sửa ID container
+
+            // Nếu không có timestamp cuối cùng, ẩn nút và thoát
+            if (!lastTimestamp) {
+                loadMoreButton.style.display = 'none';
+                return;
+            }
+
+            // Có thể thêm hiệu ứng loading tại đây
+            loadMoreButton.disabled = true; // Vô hiệu hóa nút trong khi tải
+
+            fetch(`/Admin/Dashboard/LoadMorePosts?lastPostTimestamp=${lastTimestamp}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    if (html.trim() === '') { // Kiểm tra nếu không có bài viết nào được trả về
+                        loadMoreButton.style.display = 'none'; // Ẩn nút nếu không còn bài viết
+                        return;
+                    }
+
+                    // Tạo một div tạm thời để parse HTML mới
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+
+                    // Lấy tất cả các bài viết mới từ HTML vừa parse
+                    const newPosts = tempDiv.querySelectorAll('.post-item'); // Sử dụng class mới
+
+                    if (newPosts.length > 0) {
+                        // Thêm từng bài viết vào container chính
+                        newPosts.forEach(post => {
+                            postListContainer.appendChild(post);
+                        });
+
+                        // Cập nhật timestamp mới từ bài viết cuối cùng vừa thêm
+                        const lastNewPost = newPosts[newPosts.length - 1];
+                        const newLastTimestamp = lastNewPost.getAttribute('data-timestamp');
+                        if (newLastTimestamp) {
+                            loadMoreButton.setAttribute('data-last-post-timestamp', newLastTimestamp);
+                        } else {
+                            // Nếu không tìm thấy timestamp mới, có thể ẩn nút hoặc xử lý cảnh báo
+                            loadMoreButton.style.display = 'none';
+                            console.warn("Không tìm thấy timestamp cho bài viết mới nhất.");
+                        }
+                    } else {
+                        // Không có bài viết nào được tải thêm
+                        loadMoreButton.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải thêm bài viết:', error);
+                    // Hiển thị thông báo lỗi cho người dùng
+                })
+                .finally(() => {
+                    loadMoreButton.disabled = false; // Bật lại nút
+                });
+        }
+
+        // Tùy chọn: Gọi loadMorePosts khi cuộn xuống cuối trang (infinite scroll)
+        // window.addEventListener('scroll', () => {
+        //     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) { // 100px trước khi đến cuối
+        //         const loadMoreButton = document.getElementById("loadMoreButton");
+        //         if (loadMoreButton && !loadMoreButton.disabled && loadMoreButton.style.display !== 'none') {
+        //             loadMorePosts();
+        //         }
+        //     }
+        // });
+
+    </script>
+}
