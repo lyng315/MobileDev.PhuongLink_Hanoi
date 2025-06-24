@@ -18,6 +18,9 @@ public class Post {
     private String targetRegionId;
     private String thumbnailUrl;
 
+    // Thêm thuộc tính isLiked
+    private boolean isLiked;  // Trạng thái yêu thích
+
     // Constructor công khai bắt buộc để Firestore mapping
     public Post() { }
 
@@ -71,4 +74,14 @@ public class Post {
     @Exclude
     public String getTimeAgo() { return timeAgo; }
     public void setTimeAgo(String timeAgo) { this.timeAgo = timeAgo; }
+
+    // Getter và Setter cho thuộc tính isLiked
+    @Exclude
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.isLiked = liked;
+    }
 }

@@ -148,7 +148,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         data.put("email", email);
                                         data.put("phoneNumber", phone);
                                         data.put("regionId", regionId);
-                                        data.put("roleId",  "role01");
+                                        data.put("roleId",  "zuEhNAMClJj4n1wP8bNK");
 
                                         db.collection("users")
                                                 .document(user.getUid())

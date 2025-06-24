@@ -16,10 +16,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.phuonglink_hanoi.ChangePasswordActivity;
+import com.example.phuonglink_hanoi.EditProfileActivity;
 import com.example.phuonglink_hanoi.LoginActivity;
 import com.example.phuonglink_hanoi.R;
 import com.example.phuonglink_hanoi.databinding.FragmentProfileBinding;
-import com.example.phuonglink_hanoi.ChangePasswordActivity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,24 +31,32 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private FirebaseFirestore db;
-    private FirebaseStorage storage;
+    private FirebaseAuth auth;
+    private StorageReference storageRef;
+    private String userId;
     private Uri avatarUri;
 
+    // Launcher để chọn ảnh từ gallery
     private final ActivityResultLauncher<Intent> pickImageLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == requireActivity().RESULT_OK
-                                && result.getData() != null) {
+                                && result.getData() != null
+                                && result.getData().getData() != null) {
                             avatarUri = result.getData().getData();
                             uploadAvatar();
                         }
                     }
             );
 
+    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -61,17 +70,19 @@ public class ProfileFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        db = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
+        db         = FirebaseFirestore.getInstance();
+        auth       = FirebaseAuth.getInstance();
+        storageRef = FirebaseStorage.getInstance().getReference();
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
             Toast.makeText(getContext(), "Chưa đăng nhập", Toast.LENGTH_SHORT).show();
+            requireActivity().finish();
             return;
         }
-        String userId = user.getUid();
+        userId = user.getUid();
 
-        // Lắng nghe dữ liệu user
+        // 1) Lắng nghe dữ liệu user từ Firestore
         db.collection("users")
                 .document(userId)
                 .addSnapshotListener((snap, e) -> {
@@ -86,7 +97,7 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
-        // Chọn avatar
+        // 2) Chọn avatar
         binding.imgAvatar.setOnClickListener(v -> {
             Intent pick = new Intent(
                     Intent.ACTION_PICK,
@@ -95,88 +106,95 @@ public class ProfileFragment extends Fragment {
             pickImageLauncher.launch(pick);
         });
 
-        // Đổi mật khẩu
+        // 3) Chỉnh sửa profile
+        binding.itemEditProfile.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), EditProfileActivity.class))
+        );
+
+        // 4) Đổi mật khẩu
         binding.itemChangePassword.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), ChangePasswordActivity.class))
         );
 
-        // Đăng xuất
+        // 5) Đăng xuất
         binding.itemLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
+            auth.signOut();
             startActivity(new Intent(requireActivity(), LoginActivity.class));
             requireActivity().finish();
         });
     }
 
     private void bindUserData(DocumentSnapshot snap) {
-        // Đảm bảo các biến là final để dùng trong lambda
-        final String fullName = snap.getString("fullName");
-        final String email = snap.getString("email");
-        final String phoneNumber = snap.getString("phoneNumber");
-        final String addressDetail = snap.getString("addressDetail");
-        final String regionId = snap.getString("regionId");
-        final String avatarUrl = snap.getString("avatarUrl");
+        String fullName    = snap.getString("fullName");
+        String email       = snap.getString("email");
+        String phoneNumber = snap.getString("phoneNumber");
+        String regionId    = snap.getString("regionId");
+        String avatarUrl   = snap.getString("avatarUrl");
 
         binding.tvFullName.setText(fullName != null ? fullName : "");
         binding.tvEmail.setText(email != null ? email : "");
         binding.tvPhone.setText(phoneNumber != null ? phoneNumber : "");
 
+        // Load avatar (nếu có URL), còn không dùng placeholder
         Glide.with(this)
-                .load(avatarUrl)
+                .load(avatarUrl != null ? avatarUrl : R.drawable.ic_profile)
                 .placeholder(R.drawable.ic_profile)
+                .circleCrop()
                 .into(binding.imgAvatar);
 
-        // Load tên vùng và ghép địa chỉ chi tiết
+        // Load tên vùng
         if (regionId != null && !regionId.isEmpty()) {
             db.collection("regions")
                     .document(regionId)
                     .get()
                     .addOnSuccessListener(doc -> {
-                        final String regionName = doc.getString("name");
-                        String addr = "";
-                        if (regionName != null) addr += regionName;
-                        if (addressDetail != null && !addressDetail.isEmpty()) {
-                            if (!addr.isEmpty()) addr += ", ";
-                            addr += addressDetail;
-                        }
-                        binding.tvAddress.setText(addr);
+                        String regionName = doc.getString("name");
+                        binding.tvAddress.setText(regionName != null ? regionName : "");
                     })
                     .addOnFailureListener(e ->
-                            binding.tvAddress.setText(
-                                    addressDetail != null ? addressDetail : ""
-                            )
+                            binding.tvAddress.setText("")
                     );
         } else {
-            binding.tvAddress.setText(
-                    addressDetail != null ? addressDetail : ""
-            );
+            binding.tvAddress.setText("");
         }
     }
 
     private void uploadAvatar() {
         if (avatarUri == null) return;
-        final String uid = FirebaseAuth
-                .getInstance()
-                .getCurrentUser()
-                .getUid();
 
-        StorageReference ref = storage
-                .getReference()
-                .child("avatars/" + uid + ".jpg");
+        // Path hợp lệ: avatars/{uid}/avatar.jpg
+        StorageReference avatarRef = storageRef
+                .child("avatars")
+                .child(userId)
+                .child("avatar.jpg");
 
-        ref.putFile(avatarUri)
+        avatarRef.putFile(avatarUri)
                 .continueWithTask((Continuation<UploadTask.TaskSnapshot, Task<Uri>>) task -> {
                     if (!task.isSuccessful()) throw task.getException();
-                    return ref.getDownloadUrl();
+                    return avatarRef.getDownloadUrl();
                 })
                 .addOnSuccessListener(downloadUri -> {
+                    String url = downloadUri.toString();
+                    // Cập nhật avatarUrl trong users/{uid}
                     db.collection("users")
-                            .document(uid)
-                            .update("avatarUrl", downloadUri.toString());
-                    Glide.with(this)
-                            .load(downloadUri)
-                            .placeholder(R.drawable.ic_profile)
-                            .into(binding.imgAvatar);
+                            .document(userId)
+                            .update("avatarUrl", url)
+                            .addOnSuccessListener(a -> {
+                                // Hiển thị ngay avatar mới
+                                Glide.with(this)
+                                        .load(url)
+                                        .placeholder(R.drawable.ic_profile)
+                                        .circleCrop()
+                                        .into(binding.imgAvatar);
+                                Toast.makeText(getContext(),
+                                        "Tải avatar thành công!",
+                                        Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(),
+                                            "Không lưu được URL avatar: " + e.getMessage(),
+                                            Toast.LENGTH_SHORT).show()
+                            );
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(),

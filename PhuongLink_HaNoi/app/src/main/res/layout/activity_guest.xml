@@ -94,7 +94,7 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- 3. PANEL: tiêu đề + vùng đã chọn + danh sách -->
+    <!-- 3. PANEL: tiêu đề + dropdown vùng + danh sách bài viết -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/panel"
         android:layout_width="0dp"
@@ -105,6 +105,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- Tiêu đề -->
         <TextView
             android:id="@+id/tvFilterTitle"
             android:layout_width="wrap_content"
@@ -118,21 +119,29 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
-        <TextView
-            android:id="@+id/tvSelectedRegion"
+        <!-- Dropdown chọn khu vực -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilRegion"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:padding="8dp"
-            android:background="@drawable/bg_chip"
-            android:text="(Chưa chọn)"
-            android:textColor="@color/colorPrimary"
-            android:textSize="14sp"
-            app:layout_constraintBaseline_toBaselineOf="@id/tvFilterTitle"
-            app:layout_constraintStart_toEndOf="@id/tvFilterTitle"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:layout_marginTop="8dp"
+            app:boxBackgroundMode="outline"
+            app:endIconMode="dropdown_menu"
+            app:layout_constraintTop_toBottomOf="@id/tvFilterTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
+            <AutoCompleteTextView
+                android:id="@+id/actvRegion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Chọn khu vực" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Danh sách bài viết -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPosts"
             android:layout_width="0dp"
@@ -140,7 +149,7 @@
             android:clipToPadding="false"
             android:paddingTop="12dp"
             android:paddingBottom="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvFilterTitle"
+            app:layout_constraintTop_toBottomOf="@id/tilRegion"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

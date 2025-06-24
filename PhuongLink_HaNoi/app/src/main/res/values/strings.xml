@@ -30,7 +30,7 @@
     <string name="desc_verified"></string>
     <string name="label_attach_file">Đính kèm file</string>
     <string name="label_attach_image">Đính kèm ảnh</string>
-
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 
 
 

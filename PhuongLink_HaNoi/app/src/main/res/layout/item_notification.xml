@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="12dp"
@@ -6,18 +8,18 @@
     android:layout_marginTop="20dp"
     android:layout_marginBottom="10dp"
     android:elevation="2dp"
-    android:radius="8dp"
+    app:cardCornerRadius="8dp"
     android:minHeight="100dp"
     android:padding="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="116dp"
+        android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:padding="16dp">
 
         <LinearLayout
-            android:id="@+id/notificationContent"
+            android:id="@+id/notificationContentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -33,26 +35,41 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_profile" />
 
-            <TextView
-                android:id="@+id/tvNotification"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:lineSpacingExtra="4dp"
-                android:text="Nội dung thông báo"
-                android:textColor="#000000"
-                android:textSize="16sp" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvNotificationTitle" android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#000000"
+                    android:text="Tiêu đề bài viết mới" />
+
+                <TextView
+                    android:id="@+id/tvNotificationContent" android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Nội dung tóm tắt của bài viết mới..."
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    android:maxLines="3"
+                    android:ellipsize="end"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- ✅ Thêm thời gian ở góc dưới bên trái -->
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/notificationContentLayout"
             android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="8dp"
             android:text="16/06/2025 01:16"
             android:textColor="#888888"
             android:textSize="14sp" />

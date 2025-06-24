@@ -39,12 +39,13 @@ android {
         // Nếu bạn dùng ViewBinding
         viewBinding = true
     }
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {
     // Dùng Firebase BOM để quản lý version đồng bộ
     implementation(platform("com.google.firebase:firebase-bom:31.5.0"))
-
+    implementation ("com.android.volley:volley:1.2.1")
     // Firebase Auth, Firestore, Storage (ko cần ktx nếu bạn dùng Java)
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
@@ -52,7 +53,7 @@ dependencies {
 
     // Firebase App Check interop (cho StorageRegistrar)
     implementation("com.google.firebase:firebase-appcheck-interop")
-
+    implementation ("com.google.firebase:firebase-messaging") // Kiểm tra phiên bản mới nhất
     // Glide để load ảnh (avatar, placeholder…)
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")

@@ -1,50 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app   ="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:paddingTop="32dp"
-    android:background="@color/primaryBlue"
     tools:context=".PostDetailsActivity">
 
-    <!-- Toolbar với back arrow và tiêu đề -->
+    <!-- Toolbar (giữ nguyên) -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="56dp"
+        android:layout_marginTop="24dp"
         android:background="@color/primaryBlue"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/title_post_details"
         app:titleCentered="true"
-        app:titleTextColor="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:titleTextColor="@color/white"/>
 
-    <!-- Nội dung cuộn phía dưới Toolbar -->
+    <!-- Nội dung chính -->
     <ScrollView
         android:id="@+id/scrollPostDetails"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:background="#ECECEC"
-        android:padding="16dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:background="#F5F5F5">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- 1. Avatar + Tên tác giả -->
+            <!-- HEADER -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp">
 
                 <ImageView
                     android:id="@+id/ivAuthorAvatar"
@@ -61,68 +62,81 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="@string/author_name_default"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/black" />
             </LinearLayout>
 
-            <!-- 2. Thời gian đăng -->
             <TextView
                 android:id="@+id/tvPostTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:text="@string/post_time_default"
-                android:textSize="14sp"
-                android:textColor="@color/gray" />
+                android:textSize="16sp"
+                android:textColor="@color/gray"
+                android:paddingBottom="4dp"/>
 
-            <!-- 3. Mức độ khẩn cấp -->
             <TextView
                 android:id="@+id/tvUrgency"
                 style="@style/UrgencyLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:text="@string/urgency_normal"
-                android:background="?attr/selectableItemBackground" />
+                android:textSize="16sp"
+                android:paddingBottom="0dp"/>
 
-            <!-- 4. Tiêu đề bài viết -->
-            <TextView
-                android:id="@+id/tvPostTitle"
+            <!-- Card: Nội dung bài viết -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/post_title_default"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/black" />
-
-            <!-- 5. Nội dung chi tiết -->
-            <TextView
-                android:id="@+id/tvPostContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/post_content_default"
-                android:textSize="14sp"
-                android:textColor="@color/black" />
+                android:padding="16dp">
 
-            <!-- 6. Ảnh bài viết -->
-            <ImageView
-                android:id="@+id/ivPostImage"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="12dp"
-                android:scaleType="centerCrop"
-                android:visibility="visible"
-                android:src="@drawable/ic_image_placeholder"
-                android:contentDescription="@string/post_image" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvPostTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/post_title_default"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:id="@+id/tvPostContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/post_content_default"
+                        android:textSize="16sp"
+                        android:textColor="@color/black" />
+
+                    <ImageView
+                        android:id="@+id/ivPostImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="12dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:src="@drawable/ic_image_placeholder"
+                        android:contentDescription="@string/post_image" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Like & Comment counts -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="start"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp">
 
                 <ImageButton
                     android:id="@+id/btnLike"
@@ -138,7 +152,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:text="0"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textColor="@color/black" />
 
                 <ImageButton
@@ -156,9 +170,52 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:text="0"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textColor="@color/black" />
             </LinearLayout>
+
+            <!-- Card: Input bình luận -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:gravity="center_vertical">
+
+                    <EditText
+                        android:id="@+id/edtComment"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Enter your comment..."
+                        android:textSize="16sp"
+                        android:background="@android:color/transparent"
+                        android:padding="8dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnPostComment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_send"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Post Comment"
+                        android:padding="8dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Danh sách bình luận -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

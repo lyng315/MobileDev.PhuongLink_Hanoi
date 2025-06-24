@@ -30,7 +30,6 @@ import java.util.concurrent.Executors;
 
 public class CreatePostActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
-    private static final String TAG = "CreatePostActivity";
 
     private FirebaseFirestore db;
     private StorageReference imagesRef;
@@ -40,14 +39,13 @@ public class CreatePostActivity extends AppCompatActivity {
     private TextInputEditText edtPostTitle, edtPostContent;
     private MaterialButton btnAttachImage, btnCancel, btnSubmit;
 
-    private Uri imageUri;               // nếu user chọn ảnh mới
-    private String existingImageUrl;    // giữ URL cũ khi edit
+    private Uri imageUri;
+    private String existingImageUrl;
 
     private final List<String> categoryNames = new ArrayList<>();
     private final List<String> categoryIds   = new ArrayList<>();
     private final Executor bgExecutor = Executors.newSingleThreadExecutor();
 
-    // mode = "create" hoặc "edit"
     private String mode = "create";
     private String postId;
 
@@ -75,8 +73,12 @@ public class CreatePostActivity extends AppCompatActivity {
         db.collection("users").document(uid)
                 .get()
                 .addOnSuccessListener(doc -> {
-                    String name = doc.getString("name");
-                    tvUserName.setText(name != null ? name : "");
+                    // Ưu tiên đọc fullName, fallback xuống name
+                    String name = doc.getString("fullName");
+                    if (name == null) name = doc.getString("name");
+                    if (name != null) {
+                        tvUserName.setText(name);
+                    }
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Không lấy được tên người dùng", Toast.LENGTH_SHORT).show()
@@ -87,11 +89,10 @@ public class CreatePostActivity extends AppCompatActivity {
                 this, R.array.severity_levels, R.layout.list_item_dropdown);
         actSeverity.setAdapter(sevAdapter);
 
-        // 5. Setup category spinner (AutoCompleteTextView)
+        // 5. Setup category spinner
         ArrayAdapter<String> catAdapter = new ArrayAdapter<>(
                 this, R.layout.list_item_dropdown, categoryNames);
         actPostType.setAdapter(catAdapter);
-        // load categories
         db.collection("postCategories")
                 .get()
                 .addOnSuccessListener(snapshots -> {
@@ -156,7 +157,6 @@ public class CreatePostActivity extends AppCompatActivity {
                         finish();
                         return;
                     }
-                    // Đổ data
                     String title        = doc.getString("title");
                     String content      = doc.getString("content");
                     Long urgLevelLong   = doc.getLong("urgencyLevel");
@@ -166,10 +166,9 @@ public class CreatePostActivity extends AppCompatActivity {
                     if (title != null)    edtPostTitle.setText(title);
                     if (content != null)  edtPostContent.setText(content);
                     if (urgLevelLong != null) {
-                        int urg = urgLevelLong.intValue(); // 1-3
+                        int urg = urgLevelLong.intValue();
                         actSeverity.setText(
-                                getResources()
-                                        .getStringArray(R.array.severity_levels)[urg - 1],
+                                getResources().getStringArray(R.array.severity_levels)[urg - 1],
                                 false
                         );
                     }
@@ -211,13 +210,11 @@ public class CreatePostActivity extends AppCompatActivity {
         }
         String categoryId = categoryIds.get(idx);
 
-        // Truy vấn regionId (tương tự trước)
         db.collection("users").document(uid)
                 .get()
                 .addOnSuccessListener(userDoc -> {
                     String regionId = userDoc.getString("regionId");
                     if (imageUri != null) {
-                        // upload ảnh mới
                         String mime = getContentResolver().getType(imageUri);
                         String ext  = MimeTypeMap.getSingleton()
                                 .getExtensionFromMimeType(mime);
@@ -239,7 +236,6 @@ public class CreatePostActivity extends AppCompatActivity {
                                                 Toast.LENGTH_LONG).show()
                                 );
                     } else {
-                        // không chọn ảnh mới => dùng existingImageUrl (có thể null)
                         savePost(uid, categoryId, title, content,
                                 urgencyLevel, regionId,
                                 existingImageUrl != null ? existingImageUrl : "");
@@ -252,9 +248,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 );
     }
 
-    /**
-     * Tạo mới hoặc cập nhật post tùy mode
-     */
+    /** Tạo mới hoặc cập nhật post tùy mode */
     private void savePost(String uid,
                           String categoryId,
                           String title,
@@ -264,13 +258,14 @@ public class CreatePostActivity extends AppCompatActivity {
                           String imageUrl) {
         CollectionReference posts = db.collection("posts");
         Map<String,Object> data = new HashMap<>();
-        data.put("authorUserId", uid);
-        data.put("categoryId",    categoryId);
-        data.put("title",         title);
-        data.put("content",       content);
-        data.put("urgencyLevel",  urgencyLevel);
+        data.put("authorUserId",  uid);
+        data.put("categoryId",     categoryId);
+        data.put("title",          title);
+        data.put("content",        content);
+        data.put("urgencyLevel",   urgencyLevel);
         data.put("targetRegionId", regionId);
-        data.put("thumbnailUrl",  imageUrl);
+        data.put("thumbnailUrl",   imageUrl);
+
         if ("create".equals(mode)) {
             data.put("createdAt", FieldValue.serverTimestamp());
             data.put("editedAt",  FieldValue.serverTimestamp());
@@ -286,7 +281,6 @@ public class CreatePostActivity extends AppCompatActivity {
                                     Toast.LENGTH_LONG).show()
                     );
         } else {
-            // chỉ update các field và editedAt
             data.put("editedAt", FieldValue.serverTimestamp());
             posts.document(postId)
                     .update(data)
