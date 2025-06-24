@@ -9,5 +9,10 @@
         public int GrowthPostPercent { get; set; }
         public int GrowthCommentPercent { get; set; }
         public int GrowthUserPercent { get; set; }
+
+        // Thêm thuộc tính LatestPosts để chứa danh sách 3 bài viết mới nhất
+        public List<WebApplication1.Models.Dtos.PostsDTO> LatestPosts { get; set; }
+
     }
+
 }

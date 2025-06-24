@@ -1,0 +1,20 @@
+﻿<div id="postList">
+    @foreach (var post in Model.LatestPosts)
+    {
+        <div class="post">
+            <img src="@post.ThumbnailUrl" alt="Post Image" />  <!-- Giới hạn ảnh thumbnail -->
+            <h3>@post.Title</h3>
+            <p>@post.Content</p>
+        </div>
+    }
+</div>
+
+<!-- Nút xem thêm -->
+@if (Model.LatestPosts.Count > 0)
+{
+    <button id="loadMoreButton"
+            data-last-post-timestamp="@Model.LatestPosts.LastOrDefault()?.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")"
+            onclick="loadMorePosts()">
+        Xem thêm
+    </button>
+}

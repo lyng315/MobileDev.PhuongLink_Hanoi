@@ -27,7 +27,7 @@ namespace WebApplication1.Areas.Admin.Controllers
                 d => d.GetValue<string>("title")
             );
 
-            // Lấy người dùng
+            // Lấy người dùng và tạo từ điển để tra cứu
             var userSnap = await _db.Collection("users").GetSnapshotAsync();
             var userDict = userSnap.Documents.ToDictionary(
                 d => d.Id, // chính là IdUser
@@ -42,20 +42,24 @@ namespace WebApplication1.Areas.Admin.Controllers
                 var postId = d.GetValue<string>("postId");
                 var recipientId = d.GetValue<string>("recipientId");
 
+                // Tra cứu tên người nhận từ userDict
+                var recipientName = userDict.ContainsKey(recipientId) ? userDict[recipientId] : "(Không tìm thấy)";
+
                 return new NotificationHistoryDto
                 {
-                    NotificationId = d.GetValue<string>("notificationId"),
                     PostId = postId,
                     PostTitle = postDict.ContainsKey(postId) ? postDict[postId] : "(Không tìm thấy)",
                     RecipientId = recipientId,
-                    RecipientName = userDict.ContainsKey(recipientId) ? userDict[recipientId] : recipientId,
-                    SentAt = d.GetValue<Timestamp>("sentAt").ToDateTime(),
-                    Status = d.GetValue<string>("status")
+                    RecipientName = recipientName, // Gán tên người nhận
+                    SentAt = d.GetValue<Timestamp>("sentAt").ToDateTime()
                 };
             }).ToList();
 
             return View(list);
         }
+
+
+
 
 
     }

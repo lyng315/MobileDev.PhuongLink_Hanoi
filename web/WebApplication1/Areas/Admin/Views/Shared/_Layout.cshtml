@@ -120,6 +120,11 @@
                         <i class="bi bi-bar-chart-line me-2"></i> Thống kê
                     </a>
                 </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link d-flex align-items-center text-dark @(ViewContext.RouteData.Values["controller"]?.ToString() == "Profile" ? "bg-light fw-semibold rounded shadow-sm text-primary" : "")" asp-area="Admin" asp-controller="Profile" asp-action="Index">
+                        <i class="bi bi-bar-chart-line me-2"></i> Hồ sơ
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -129,10 +134,6 @@
             <div class="navbar-fixed">
                 <span class="fw-bold fs-5">@ViewData["Title"]</span>
                 <div class="d-flex align-items-center gap-2">
-                    <span>Trần Dung</span>
-                    <div class="bg-white text-primary fw-semibold rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                        TD
-                    </div>
                 </div>
             </div>
 

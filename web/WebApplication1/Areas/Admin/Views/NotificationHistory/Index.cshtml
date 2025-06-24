@@ -15,7 +15,6 @@
                 <th style="width: 20%;">Bài Viết</th>
                 <th style="width: 20%;">Người Nhận</th>
                 <th style="width: 20%;">Thời Gian Gửi</th>
-                <th style="width: 15%;">Trạng Thái</th>
                 <th style="width: 20%;">Hành Động</th>
             </tr>
         </thead>
@@ -28,21 +27,7 @@
                     <td>@n.RecipientName</td>
                     <td>@n.SentAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                     <td>
-                        @if (n.Status == "Failed")
-                        {
-                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Thất bại</span>
-                        }
-                        else if (n.Status == "Sent")
-                        {
-                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Đã gửi</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">@n.Status</span>
-                        }
-                    </td>
-                    <td>
-                        <form asp-area="Admin" asp-controller="NotificationHistory" asp-action="Delete" asp-route-id="@n.NotificationId"
+                        <form asp-area="Admin" asp-controller="NotificationHistory" asp-action="Delete" asp-route-id="@n.PostId"
                               method="post" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-outline-danger"
                                     onclick="return confirm('Bạn có chắc chắn muốn xóa thông báo này?');">

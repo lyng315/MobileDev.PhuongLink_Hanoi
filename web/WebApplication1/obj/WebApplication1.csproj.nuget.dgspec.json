@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\MobileDev.PhuongLink_Hanoi\\web\\WebApplication1\\WebApplication1.csproj": {}
+    "D:\\MobileDev.PhuongLink_Hanoi\\Web\\WebApplication1\\WebApplication1.csproj": {}
   },
   "projects": {
-    "D:\\MobileDev.PhuongLink_Hanoi\\web\\WebApplication1\\WebApplication1.csproj": {
+    "D:\\MobileDev.PhuongLink_Hanoi\\Web\\WebApplication1\\WebApplication1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\MobileDev.PhuongLink_Hanoi\\web\\WebApplication1\\WebApplication1.csproj",
+        "projectUniqueName": "D:\\MobileDev.PhuongLink_Hanoi\\Web\\WebApplication1\\WebApplication1.csproj",
         "projectName": "WebApplication1",
-        "projectPath": "D:\\MobileDev.PhuongLink_Hanoi\\web\\WebApplication1\\WebApplication1.csproj",
+        "projectPath": "D:\\MobileDev.PhuongLink_Hanoi\\Web\\WebApplication1\\WebApplication1.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "D:\\MobileDev.PhuongLink_Hanoi\\web\\WebApplication1\\obj\\",
+        "outputPath": "D:\\MobileDev.PhuongLink_Hanoi\\Web\\WebApplication1\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

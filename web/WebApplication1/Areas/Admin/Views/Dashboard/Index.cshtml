@@ -1,14 +1,18 @@
 ﻿@model WebApplication1.Models.ViewModels.CommunityDashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Bảng tin Cộng đồng";
+    var stt = 0;
+    var searchQuery = ViewData["SearchQuery"]?.ToString();  // Lấy giá trị searchQuery từ ViewData
+    var skip = Model.LatestPosts.Count; // Số bài viết đã hiển thị
 }
 
 <div class="container my-4">
     <h2 class="fw-bold">Bảng tin cộng đồng</h2>
     <p class="text-muted">Cập nhật thông tin mới nhất trong khu vực</p>
 
+    <!-- Phần Thống Kê -->
     <div class="row g-4 my-3">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body text-center">
                     <div class="mb-2 fs-3 text-primary"><i class="bi bi-journal-text"></i></div>
@@ -21,7 +25,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body text-center">
                     <div class="mb-2 fs-3 text-warning"><i class="bi bi-chat-dots"></i></div>
@@ -34,7 +38,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body text-center">
                     <div class="mb-2 fs-3 text-success"><i class="bi bi-people"></i></div>
@@ -47,4 +51,68 @@
             </div>
         </div>
     </div>
+
+    <!-- Phần Tìm Kiếm -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form method="get" asp-action="Index">
+                <div class="input-group">
+                    <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm bài viết..." value="@searchQuery" />
+                    <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hiển thị 3 bài viết mới nhất -->
+    <div id="latest-posts" class="row g-4 my-3">
+        @foreach (var post in Model.LatestPosts)
+        {
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <!-- Hiển thị ảnh thumbnail -->
+                        @if (!string.IsNullOrEmpty(post.ThumbnailUrl))
+                        {
+                            <img src="@post.ThumbnailUrl" class="img-fluid mb-3" alt="Thumbnail" />
+                        }
+                        <h5 class="card-title">@post.Title</h5>
+                        <p class="card-text">@post.Content.Substring(0, Math.Min(post.Content.Length, 100))...</p>
+                        <a href="@Url.Action("Details", "Posts", new { id = post.Id })" class="btn btn-primary">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Nút Xem Thêm bài viết -->
+    <div class="row mt-3">
+        <div class="col-md-12 text-center">
+            <button id="loadMoreBtn" class="btn btn-outline-primary" onclick="loadMorePosts()">Xem thêm bài viết</button>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        var skip = @skip; // Biến skip chứa số lượng bài viết đã hiển thị
+
+        function loadMorePosts() {
+            const lastTimestamp = document.getElementById("loadMoreButton").getAttribute("data-last-post-timestamp");
+
+            fetch(`/Admin/Dashboard/LoadMorePosts?lastPostTimestamp=${lastTimestamp}`)
+                .then(response => response.text())
+                .then(data => {
+                    // Thêm bài viết mới vào phần hiển thị
+                    const postList = document.getElementById("postList");
+                    postList.innerHTML += data;  // Gắn thêm các bài viết mới vào danh sách hiện tại
+
+                    // Cập nhật timestamp mới để load tiếp
+                    const lastPost = postList.querySelector('.post:last-child');
+                    const newTimestamp = lastPost.getAttribute('data-timestamp');
+                    document.getElementById("loadMoreButton").setAttribute('data-last-post-timestamp', newTimestamp);
+                });
+        }
+
+ </script>
+ }
