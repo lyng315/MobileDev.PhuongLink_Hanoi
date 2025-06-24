@@ -17,6 +17,10 @@ namespace WebApplication1.Models.Dtos
         [FirestoreProperty("content")]
         public string Content { get; set; } = string.Empty;
 
+        // Thumbnail URL riêng biệt
+        [FirestoreProperty("thumbnailUrl")]
+        public string ThumbnailUrl { get; set; } = string.Empty;
+
         // URLs of images associated with the post
         [FirestoreProperty("imageUrls")]
         public List<string> ImageUrls { get; set; } = new List<string>();

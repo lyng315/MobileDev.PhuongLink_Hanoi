@@ -59,15 +59,24 @@ namespace WebApplication1.Areas.Admin.Controllers
             var postDto = postSnap.ConvertTo<PostsDTO>();
             postDto.Id = postSnap.Id;
 
+            // → Kết hợp thumbnailUrl vào danh sách ImageUrls
+            postDto.ImageUrls = postDto.ImageUrls ?? new List<string>();
+            if (!string.IsNullOrEmpty(postDto.ThumbnailUrl))
+            {
+                postDto.ImageUrls.Insert(0, postDto.ThumbnailUrl);
+            }
+
             // Lookup author, category, region
             var userSnap = await _db.Collection("users").Document(postDto.AuthorUserId ?? "").GetSnapshotAsync();
             postDto.AuthorName = userSnap.Exists ? userSnap.GetValue<string>("fullName") : "";
+
             var catSnap = await _db.Collection("postCategories").Document(postDto.CategoryId ?? "").GetSnapshotAsync();
             postDto.CategoryName = catSnap.Exists ? catSnap.GetValue<string>("name") : "";
+
             var regSnap = await _db.Collection("regions").Document(postDto.TargetRegionId ?? "").GetSnapshotAsync();
             postDto.RegionName = regSnap.Exists ? regSnap.GetValue<string>("name") : "";
 
-            // 2) Load comments (filter only) and sort in-memory
+            // 2) Load comments và sort
             var commentSnap = await _db.Collection("comments")
                                        .WhereEqualTo("postId", id)
                                        .GetSnapshotAsync();
@@ -77,8 +86,9 @@ namespace WebApplication1.Areas.Admin.Controllers
                 {
                     var dto = c.ConvertTo<CommentDto>();
                     dto.Id = c.Id;
-                    // Lookup commenter name
-                    var commenter = _db.Collection("users").Document(dto.AuthorUserId ?? "").GetSnapshotAsync().Result;
+                    var commenter = _db.Collection("users")
+                                       .Document(dto.AuthorUserId ?? "")
+                                       .GetSnapshotAsync().Result;
                     dto.AuthorName = commenter.Exists ? commenter.GetValue<string>("fullName") : "";
                     return dto;
                 })

@@ -34,13 +34,34 @@
             @Html.Raw(Model.Post.Content?.Replace("\n", "<br/>"))
         </div>
 
-        @if (Model.Post.ImageUrls?.Any() == true)
+        @* — Hiển thị ảnh đại diện (thumbnail) nếu có — *@
+        @if (!string.IsNullOrEmpty(Model.Post.ThumbnailUrl))
+        {
+            <h5 class="mb-3"></h5>
+            <div class="mb-4">
+                <img src="@Model.Post.ThumbnailUrl"
+                     class="img-fluid img-thumbnail"
+                     style="max-width:300px;"
+                     alt="Thumbnail của bài viết" />
+            </div>
+        }
+
+        @* — Hiển thị các ảnh còn lại (nếu có) — *@
+        @{
+            var extraImages = Model.Post.ImageUrls?
+            .Where(u => u != Model.Post.ThumbnailUrl)
+            .ToList();
+        }
+        @if (extraImages != null && extraImages.Any())
         {
             <h5 class="mb-3">Hình ảnh liên quan</h5>
             <div class="d-flex flex-wrap gap-3 mb-4">
-                @foreach (var url in Model.Post.ImageUrls)
+                @foreach (var url in extraImages)
                 {
-                    <img src="@url" class="img-thumbnail" style="max-width:200px;" alt="Post image" />
+                    <img src="@url"
+                         class="img-thumbnail"
+                         style="max-width:200px;"
+                         alt="Hình ảnh liên quan" />
                 }
             </div>
         }
@@ -59,7 +80,9 @@
                     <li class="list-group-item">
                         <div class="d-flex justify-content-between">
                             <strong>@c.AuthorName</strong>
-                            <small class="text-secondary">@c.CreatedAt.ToDateTime().ToString("dd/MM/yyyy HH:mm")</small>
+                            <small class="text-secondary">
+                                @c.CreatedAt.ToDateTime().ToString("dd/MM/yyyy HH:mm")
+                            </small>
                         </div>
                         <p class="mb-0">@c.Content</p>
                     </li>
