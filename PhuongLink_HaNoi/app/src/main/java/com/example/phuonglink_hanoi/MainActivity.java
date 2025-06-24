@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     // Request code cho quyền thông báo
     private static final int PERMISSION_REQUEST_CODE = 1001;
 
-    private ActivityMainBinding binding;
+    private     ActivityMainBinding binding;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
@@ -90,18 +90,18 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                        return;
+                    if (task.isSuccessful()) {
+                        String token = task.getResult();
+                        Log.d("FCM_TOKEN", token);
                     }
-                    // Lấy mã thông báo đăng ký FCM mới
-                    String token = task.getResult();
-                    Log.d(TAG, "FCM Token: " + token);
-                    // Lưu token này vào tài liệu người dùng của bạn trong Firestore
-                    saveFcmTokenToFirestore(uid, token); // Truyền uid của người dùng hiện tại
                 });
-        // --- Kết thúc logic FCM token và yêu cầu quyền ---
 
+        // --- Kết thúc logic FCM token và yêu cầu quyền ---
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
 
         // 5. Bắt sự kiện chọn item bằng if-else
         binding.navView.setOnItemSelectedListener(item -> {

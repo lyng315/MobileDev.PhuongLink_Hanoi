@@ -39,6 +39,7 @@ android {
         // Nếu bạn dùng ViewBinding
         viewBinding = true
     }
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {
@@ -52,7 +53,7 @@ dependencies {
 
     // Firebase App Check interop (cho StorageRegistrar)
     implementation("com.google.firebase:firebase-appcheck-interop")
-    implementation ("com.google.firebase:firebase-messaging:23.4.0") // Kiểm tra phiên bản mới nhất
+    implementation ("com.google.firebase:firebase-messaging") // Kiểm tra phiên bản mới nhất
     // Glide để load ảnh (avatar, placeholder…)
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")

@@ -1,67 +1,26 @@
-exports.sendPostNotification = onDocumentCreated(
-  { region: "asia-east1" },
-  "posts/{postId}",
+// Import đúng module v2 Firestore trigger
+const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const admin                   = require('firebase-admin');
+admin.initializeApp();
+
+exports.sendNotificationOnNewPost = onDocumentCreated(
+  'posts/{postId}',
   async (event) => {
-    console.log("Full event received:", JSON.stringify(event, null, 2));
-    const snapshot = event.data;
-    if (!snapshot) {
-      console.log("No data found in event.data. Event might be malformed or trigger incorrectly.");
-      return;
-    }
+    const newPost = event.data;
 
-    const newPost = snapshot.data();
-    const postId = event.params.postId;
-    
-    // Kiểm tra dữ liệu trước khi sử dụng
-    const postTitle = newPost.title || "No Title";  // Nếu title không có, sử dụng giá trị mặc định
-    const postContent = newPost.content || "No Content Available";  // Nếu content không có, sử dụng giá trị mặc định
-
-    const notificationBody = postContent.length > 100 ? postContent.substring(0, 97) + "..." : postContent;
-
-    console.log(`Bài viết mới được tạo: ${postTitle} (ID: ${postId})`);
-
-    // Cấu hình gửi thông báo FCM (nếu cần)
     const payload = {
       notification: {
-        title: `Bài viết mới: ${postTitle}`,
-        body: notificationBody,
-        icon: "ic_notification",  // Đảm bảo bạn có icon này trong drawable
-        sound: "default"
+        title: newPost.title   || 'Bài viết mới',
+        body:  newPost.content || ''        // <-- hiển thị nguyên content
       },
-      data: {
-        postId: postId,
-        type: "new_post_alert"
-      }
+      topic: 'all_devices'
     };
 
-    // Gửi notification đến các token (nếu có token)
     try {
-      const usersSnapshot = await admin.firestore().collection("users").get();
-      const tokens = [];
-      usersSnapshot.forEach(doc => {
-        const userData = doc.data();
-        if (userData.fcmToken) {
-          tokens.push(userData.fcmToken);
-        }
-      });
-
-      if (tokens.length === 0) {
-        console.log("Không có FCM token nào được tìm thấy để gửi thông báo.");
-        return;
-      }
-
-      const response = await admin.messaging().sendToDevice(tokens, payload);
-      console.log("Thông báo đã được gửi thành công:", response);
-
-      response.results.forEach((result, index) => {
-        const error = result.error;
-        if (error) {
-          console.error("Lỗi khi gửi thông báo tới token:", tokens[index], error);
-        }
-      });
-
+      const response = await admin.messaging().send(payload);
+      console.log('✅ FCM sent:', response);
     } catch (error) {
-      console.error("Lỗi khi gửi thông báo bài đăng mới:", error);
+      console.error('❌ FCM error:', error);
     }
   }
 );
