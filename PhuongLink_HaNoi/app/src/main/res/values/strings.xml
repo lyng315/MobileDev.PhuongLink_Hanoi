@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">PhuongLink_HaNoi</string>
+    <string name="title_home">Trang chủ</string>
+    <string name="title_post">Bài đăng</string>
+    <string name="title_notifications">Thông báo</string>
+    <string name="title_profile">Cá nhân</string>
+    <string name="logo_hanoi_desc">Logo Hà Nội</string>
+    <string name="hint_username">Email/SĐT</string>
+    <string name="hint_password">Mật khẩu</string>
+    <string name="tv_forgot">Quên mật khẩu?</string>
+    <string name="btn_login">Đăng nhập</string>
+    <string name="tv_signup_prompt">Chưa có tài khoản?</string>
+    <string name="tv_signup_link">Đăng kí ngay.</string>
+    <string name="desc_logo">Logo PhuongLink Hà Nội</string>
+    <string name="desc_favorite">Yêu thích</string>
+    <string name="desc_comment">Bình luận</string>
+    <string name="title_post_details">Chi tiết bài viết</string>
+    <string name="author_avatar">Avatar tác giả</string>
+    <string name="author_name_default">Tên tác giả</string>
+    <string name="urgency_normal">Bình thường</string>
+    <string name="post_time_default">20 phút trước</string>
+    <string name="post_title_default">Tiêu đề bài viết</string>
+    <string name="post_content_default">Nội dung chi tiết của bài viết...</string>
+    <string name="post_image">Ảnh bài viết</string>
+    <string name="action_like">Thích</string>
+    <string name="action_comment">Bình luận</string>
+    <string name="action_signup">Đăng ký</string>
+    <string name="action_login">Đăng nhập</string>
+    <string name="desc_user_avatar">Ảnh đại diện người dùng</string>
+    <string name="desc_verified"></string>
+    <string name="label_attach_file">Đính kèm file</string>
+    <string name="label_attach_image">Đính kèm ảnh</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
+
+
+</resources>
